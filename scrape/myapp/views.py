@@ -1,12 +1,11 @@
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-# from .scraper import scrape_website
+from rest_framework import status
+from .models import Events
+from .serializers import EventSerializer
 
-# @api_view(['GET'])
-# def get_events(request):
-#     scraped_data = scrape_website()
-    
-#     if scraped_data:
-#         return Response(scraped_data)
-#     else:
-#         return Response({"error": "Failed to scrape data"}, status=500)
+class EventList(APIView):
+    def get(self, request):
+        events = Events.objects.all()[:10]  # Fetching the first 10 entries
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
