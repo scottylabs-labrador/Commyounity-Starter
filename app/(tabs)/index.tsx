@@ -1,70 +1,123 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons'; 
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const events = [
+  { id: '1', name: 'Charli xcx Concert', date: 'Oct 28, 2024', time: '7:00 PM', tags: 'concert • music' },
+  { id: '2', name: 'Haunted House', date: 'Oct 31, 2024', time: '6:00 PM', tags: 'seasonal • horror' },
+  { id: '3', name: 'Downtown Night Market', date: 'Nov 12, 2024', time: '5:30 PM', tags: 'shopping • games' },
+  { id: '4', name: 'Thanksgiving Parade', date: 'Nov 28, 2024', time: '12:00 PM', tags: 'seasonal • parade' },
+];
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+const EventList = () => {
+  const renderItem = ({ item }: any) => (
+    <View style={styles.eventCard}>
+      <View style={styles.eventTextContainer}>
+        <Text style={styles.eventName}>{item.name}</Text>
+        <Text style={styles.eventDate}>{item.date}</Text>
+        <Text style={styles.eventTime}>{item.time}</Text>
+        <Text style={styles.eventTags}>{item.tags}</Text>
+      </View>
+    </View>
   );
-}
+
+  return (
+    <FlatList
+      data={events}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      style={styles.eventList}
+    />
+  );
+};
+
+const App = () => {
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* logo and search bar */}
+      <View style={styles.header}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search"
+          placeholderTextColor="#999"
+        />
+      </View>
+
+      {/* list of events */}
+      <EventList />
+
+      {/* bottom bar */}
+      <View style={styles.bottomNav}>
+        <FontAwesome name="calendar" size={24} color="gray" />
+        <FontAwesome name="heart" size={24} color="gray" />
+        <FontAwesome name="users" size={24} color="gray" />
+        <FontAwesome name="user" size={24} color="gray" />
+      </View>
+    </SafeAreaView>
+  );
+};
+
+export default App;
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+  },
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    paddingHorizontal: 20,
+    paddingTop: 10,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  searchBar: {
+    flex: 1,
+    backgroundColor: '#EFEFEF',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 25,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  eventList: {
+    marginHorizontal: 20,
+    marginTop: 10,
+  },
+  eventCard: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  eventTextContainer: {
+    marginLeft: 15,
+    flex: 1,
+  },
+  eventName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  eventDate: {
+    fontSize: 14,
+    color: '#555555',
+    marginTop: 5,
+  },
+  eventTime: {
+    fontSize: 14,
+    color: '#555555',
+    marginTop: 5,
+  },
+  eventTags: {
+    fontSize: 12,
+    color: '#999999',
+    marginTop: 5,
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 10,
+    backgroundColor: '#FFFFFF',
+    borderTopColor: '#CCCCCC',
+    borderTopWidth: 1,
   },
 });
