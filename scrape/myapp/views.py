@@ -17,7 +17,7 @@ class EventList(APIView):
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-#api url: http://127.0.0.1:8000/api/eventlist/search?q=music&page=2&page_size=10
+#api url: http://127.0.0.1:8000/api/eventlist/search?q=keyword&page=2&page_size=10
 class EventListSearch(APIView):
 
     pagination_class = EventPagination
