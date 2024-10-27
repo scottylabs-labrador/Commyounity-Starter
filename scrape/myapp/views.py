@@ -14,7 +14,7 @@ class EventPagination(PageNumberPagination):
 class EventList(APIView):
     def get(self, request):
         events = Events.objects.all()[:10]
-        serializer = EventSerializer(events, many=True)
+        serializer = EventSerializer(events, many=True) # handle multiple records
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 #api url: http://127.0.0.1:8000/api/eventlist/search?q=keyword&page=2&page_size=10
