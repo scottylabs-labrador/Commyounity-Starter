@@ -52,3 +52,20 @@ class EventListSearch(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+# http://127.0.0.1:8000/api/get-likes/?username=bbb
+class UserLikes(APIView):
+    def get(self, request):
+        username = request.query_params.get('username', None)
+
+        try:
+            user = User.objects.get(username=username)
+            event_id = user.events
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        events = Events.objects.all()
+        matching_events = [event for event in events if event.id in event_id]
+        serializer = EventSerializer(matching_events, many=True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+

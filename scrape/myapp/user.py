@@ -48,6 +48,7 @@ def update_user_preference(request):
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
+# http://127.0.0.1:8000/api/update-likes/?username=bbb&events={10,20,30,40}
 @api_view(['GET'])
 def update_user_events(request):
     username = request.query_params.get('username', None);
