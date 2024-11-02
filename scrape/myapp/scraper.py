@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.edge.options import Options 
 from bs4 import BeautifulSoup
+from datetime import date, datetime
 # from myapp.models import Events
 import time
 
@@ -23,44 +24,73 @@ def scrape():
     options.add_argument('--lang=en-US')
     # driver = webdriver.Edge(service=service, options=options)
     driver = webdriver.Chrome()
-
-    driver.get('https://www.google.com/search?q=pittsburgh+events&sca_esv=ea89727b02e8330d&ei=V7QBZ8r5AeCs5NoPvO-GiAk&ved=0ahUKEwiKgZSQnPiIAxVgFlkFHby3AZEQ4dUDCA8&uact=5&oq=pittsburgh+events&gs_lp=Egxnd3Mtd2l6LXNlcnAiEXBpdHRzYnVyZ2ggZXZlbnRzMgoQABiwAxjWBBhHMgoQABiwAxjWBBhHMgoQABiwAxjWBBhHMgoQABiwAxjWBBhHMgoQABiwAxjWBBhHMgoQABiwAxjWBBhHMgoQABiwAxjWBBhHMgoQABiwAxjWBBhHMg0QABiABBiwAxhDGIoFMg0QABiABBiwAxhDGIoFMg0QABiABBiwAxhDGIoFMg0QABiABBiwAxhDGIoFMhwQLhiABBiwAxhDGMcBGMgDGIoFGI4FGK8B2AEBMhwQLhiABBiwAxhDGMcBGMgDGIoFGI4FGK8B2AEBMhkQLhiABBiwAxjRAxhDGMcBGMgDGIoF2AEBMhwQLhiABBiwAxhDGMcBGMgDGIoFGI4FGK8B2AEBMhkQLhiABBiwAxhDGMcBGMgDGIoFGK8B2AEBMhwQLhiABBiwAxhDGMcBGMgDGIoFGI4FGK8B2AEBMhwQLhiABBiwAxhDGMcBGMgDGIoFGI4FGK8B2AEBMhMQLhiABBiwAxhDGMgDGIoF2AEBSKoLUL0HWP8JcAF4AJABAJgBXaAB7AKqAQE1uAEDyAEA-AEBmAIFoAKxAsICDRAAGIAEGLEDGIMBGA3CAgcQABiABBgNwgIQEAAYgAQYsQMYgwEYigUYDcICEBAAGIAEGLEDGEMYgwEYigXCAg0QABiABBixAxiDARgKwgIHEAAYgAQYCsICEBAAGIAEGLEDGIMBGIoFGAqYAwDiAwUSATEgQIgGAZAGFLoGBggBEAEYCJIHATWgB-9b&sclient=gws-wiz-serp')
-    time.sleep(5)
-
-    html = driver.page_source
-    soup = BeautifulSoup(html, 'html.parser')
-    # ol = soup.find_all('div', attrs={'jscontroller':'NGvQ3'})
-    # ol = soup.find_all('li', attrs={'class':'PaEvOc'})
-    ol = soup.find_all('div', attrs={'class':'fzHfmf'})
-
-
-    # a_elements = ol.find_all('a')
+    categories = ["art", "performing+arts", "music", "travel","play", "theater"]
+    nameCategories = ["Art", "Performing Arts", "Music", "Travel","Play", "Theater"]
     data_list = []
+    for x in range(len(categories)):
 
-    #scrape
-    for a in ol:
-        tit = a.find("div", class_="YOGjf").get_text(strip=True)
-        temp = a.find("div", class_ = "cEZxRc").get_text(strip=True)
-        tim = ''.join([i if ord(i) < 128 else ' ' for i in temp]).replace(",","").split()
-        [k, j ]= a.find_all("div", class_ = "cEZxRc zvDXNd")
-        [name,place] =[k.get_text(strip=True), j.get_text(strip=True)]
+        driver.get('https://www.google.com/search?q=' + categories[x] + '+pittsburgh+events')
+        time.sleep(2)
+        html = driver.page_source
+        soup = BeautifulSoup(html, 'html.parser')
+        ol = soup.find_all('div', attrs={'class':'odIJnf'})
+
+        # a_elements = ol.find_all('a')
+        #scrape
+        for a in ol:
+
+            tit = a.find("div", class_="YOGjf").get_text(strip=True)
+            temp = a.find("div", class_ = "cEZxRc").get_text(strip=True)
+            tim = ''.join([i if ord(i) < 128 else ' ' for i in temp]).replace(",","").split()
+            day = a.find("div", class_="UIaQzd").get_text(strip=True)
+            month = a.find("div", class_="wsnHcb").get_text(strip=True).upper()
+            [k, j ]= a.find_all("div", class_ = "cEZxRc zvDXNd")
+            [name,place] =[k.get_text(strip=True), j.get_text(strip=True)]
 
 
-        
-        data = Event_Container();
-        data.title = tit;
-        # data.category = cat;
-        # data.location = loc;
-        data.time = tim;
+            
+            data = Event_Container();
+            data.title = tit;
+            data.month = month
+            data.day = day
+            data.category = nameCategories[x];
+            data.location = name+" "+place;
+            if(len(tim)>3 and tim[0] in ["Mon","Tues","Tue","Wed","Thurs","Thu","Fri","Sat","Sun","Today","Tomorrow"]):
+                if(":" in tim[1]):
+                    if(len(tim)==4):
+                        data.time = tim[1] + " " + tim[3]
+                    elif(len(tim)==5):
+                        data.time = tim[1]+" "+tim[2]
+                    else:
+                        data.time = "Unknown"
+                elif(tim[1].isnumeric()):
+                    if(len(tim)==4):
+                        data.time = tim[1]+":00 "+tim[3]
+                    elif(len(tim)==5):
+                        data.time = tim[1]+":00 "+tim[2]
+                    else:
+                        data.time = "Unknown"
+                else:
+                    data.time = "Unknown"
+            else:
+                data.time = "Unknown"
 
-        m = 0
-        d = 0
-        if(temp[0] == "Today"):
-            m = 14
-        data.month = m;
-        data.day = d;
-
-        data_list.append(data);
+            weekdays = ["MON", "TUE","WED","THU","FRI","SAT","SUN"]
+            if(tim[0] == "Today"):
+                data.weekday = weekdays[date.today().weekday()%7]
+            elif(tim[0] == 'Tomorrow'):
+                data.weekday = weekdays[(date.today().weekday()+1) %7]
+            else:
+                practice = date.today().replace(month=datetime.strptime(month, '%b').month).replace(day=int(day))
+                data.weekday = weekdays[practice.weekday()%7]
+            
+            similar = False;
+            for a in data_list:
+                if (a.title == data.title and a.day == data.day and a.month == data.month):
+                    similar = True;
+            if( not similar):
+                data_list.append(data);
+                    
 
     driver.quit()
     return data_list;
@@ -68,7 +98,7 @@ def scrape():
 def insert():
     datalist = scrape();
     for event in datalist:
-        print("Title: " +event.title + "Category: " +event.category + "Location: "+event.location + "Month: "+event.month+"Day: "+event.day+"Weekday: "+event.weekday+"Time: "+event.time)
+        print("Title: " +event.title + " Category: " +event.category + " Location: "+event.location + " Month: "+event.month+" Day: "+event.day+" Weekday: "+event.weekday+" Time: "+event.time)
         # Events.objects.create(
         #     title=event.title,
         #     category=event.category,
