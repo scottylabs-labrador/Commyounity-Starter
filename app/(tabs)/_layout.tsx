@@ -4,6 +4,7 @@ import React from 'react';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { FontAwesome } from '@expo/vector-icons'; 
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -14,7 +15,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
       }}>
-      <Tabs.Screen
+        <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
@@ -24,11 +25,38 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+       name="calendar"
+       options={{
+         title: 'Calendar',
+         tabBarIcon: ({ color, focused }) => (
+           <TabBarIcon name={'calendar'} color={color} />
+         ),
+       }}
+     />
+      <Tabs.Screen
+        name="likes"
         options={{
-          title: 'Explore',
+          title: 'Likes',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <TabBarIcon name={'heart'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="friends"
+        options={{
+          title: 'Friends',
+          tabBarIcon: ({ color, focused }) => (
+            <FontAwesome name={'users'} size = {24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, focused }) => (
+            <FontAwesome name={'user'} size = {24} color={color} />
           ),
         }}
       />

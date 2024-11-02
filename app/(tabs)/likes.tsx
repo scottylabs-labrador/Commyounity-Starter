@@ -5,8 +5,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const events = [
   { id: '1', name: 'Charli xcx Concert', date: 'Oct 28, 2024', time: '7:00 PM', tags: 'concert • music' },
-  { id: '2', name: 'Haunted House', date: 'Oct 31, 2024', time: '6:00 PM', tags: 'seasonal • horror' },
-  { id: '3', name: 'Downtown Night Market', date: 'Nov 12, 2024', time: '5:30 PM', tags: 'shopping • games' },
   { id: '4', name: 'Thanksgiving Parade', date: 'Nov 28, 2024', time: '12:00 PM', tags: 'seasonal • parade' },
 ];
 

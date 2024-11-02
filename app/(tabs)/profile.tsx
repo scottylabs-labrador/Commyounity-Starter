@@ -3,12 +3,18 @@ import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const events = [
-  { id: '1', name: 'Charli xcx Concert', date: 'Oct 28, 2024', time: '7:00 PM', tags: 'concert • music' },
-  { id: '2', name: 'Haunted House', date: 'Oct 31, 2024', time: '6:00 PM', tags: 'seasonal • horror' },
-  { id: '3', name: 'Downtown Night Market', date: 'Nov 12, 2024', time: '5:30 PM', tags: 'shopping • games' },
-  { id: '4', name: 'Thanksgiving Parade', date: 'Nov 28, 2024', time: '12:00 PM', tags: 'seasonal • parade' },
+const pastEvents = [
+    { id: '2', name: 'Haunted House', date: 'Oct 31, 2024', time: '6:00 PM', tags: 'seasonal • horror' },       
+    { id: '3', name: 'Downtown Night Market', date: 'Nov 12, 2024', time: '5:30 PM', tags: 'shopping • games' },
 ];
+
+const interests = [
+    { id: "performing arts"},
+    { id: " music"}, 
+    { id: "sports" }
+];
+
+
 
 const EventList = () => {
   const renderItem = ({ item }: any) => (
@@ -24,7 +30,7 @@ const EventList = () => {
 
   return (
     <FlatList
-      data={events}
+      data={pastEvents}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
       style={styles.eventList}
