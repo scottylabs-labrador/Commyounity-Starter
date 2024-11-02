@@ -24,8 +24,9 @@ def scrape():
     options.add_argument('--lang=en-US')
     # driver = webdriver.Edge(service=service, options=options)
     driver = webdriver.Chrome()
-    categories = ["art", "performing+arts", "music", "travel","play", "theater"]
-    nameCategories = ["Art", "Performing Arts", "Music", "Travel","Play", "Theater"]
+
+    categories = ["arts+and+crafts", "performing+arts", "music", "travel","play", "theater", "athletic","sports","urban","workshop","comedy","food", "other"]
+    nameCategories = ["ART & CRAFTS", "PERFORMING ARTS", "MUSIC", "TRAVEL","PLAY", "THEATER", "ATHLETIC","SPORTS & OUTDOORS","URBAN","WORKSHOP", "COMEDY","FOOD & DRINK","OTHERS"]
     data_list = []
     for x in range(len(categories)):
 
