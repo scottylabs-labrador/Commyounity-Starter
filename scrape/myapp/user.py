@@ -30,3 +30,21 @@ def check_user_account(request):
     else:
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
+#http://127.0.0.1:8000/api/update-preference/?username=bbb&preference=travel&preference=music&preference={%22travel%22,%22music%22}
+@api_view(['GET'])
+def update_user_preference(request):
+    username = request.query_params.get('username', None);
+    preference = request.query_params.get('preference', []);
+    print(preference)
+
+    if not username:
+        return Response({"error": "Username is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(username=username)
+        user.preference = preference
+        user.save()
+
+        return Response({"message": "User preference updated successfully"}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
