@@ -30,12 +30,11 @@ def check_user_account(request):
     else:
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-#http://127.0.0.1:8000/api/update-preference/?username=bbb&preference=travel&preference=music&preference={%22travel%22,%22music%22}
+# http://127.0.0.1:8000/api/update-preference/?username=bbb&preference={%22TRAVEL%22,%22ATHLETIC%22}
 @api_view(['GET'])
 def update_user_preference(request):
     username = request.query_params.get('username', None);
     preference = request.query_params.get('preference', []);
-    print(preference)
 
     if not username:
         return Response({"error": "Username is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -46,5 +45,23 @@ def update_user_preference(request):
         user.save()
 
         return Response({"message": "User preference updated successfully"}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+# http://127.0.0.1:8000/api/update-likes/?username=bbb&events={10,20,30,40}
+@api_view(['GET'])
+def update_user_events(request):
+    username = request.query_params.get('username', None);
+    events = request.query_params.get('events', []);
+
+    if not username:
+        return Response({"error": "Username is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(username=username)
+        user.events = events
+        user.save()
+
+        return Response({"message": "User events updated successfully"}, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
