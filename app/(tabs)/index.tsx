@@ -3,15 +3,16 @@ import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const events = [
-  { id: '1', name: 'Charli xcx Concert', date: 'Oct 28, 2024', time: '7:00 PM', tags: 'concert • music' },
-  { id: '2', name: 'Haunted House', date: 'Oct 31, 2024', time: '6:00 PM', tags: 'seasonal • horror' },
-  { id: '3', name: 'Downtown Night Market', date: 'Nov 12, 2024', time: '5:30 PM', tags: 'shopping • games' },
-  { id: '4', name: 'Thanksgiving Parade', date: 'Nov 28, 2024', time: '12:00 PM', tags: 'seasonal • parade' },
-];
+interface Event {
+  id: string;
+  name: string;
+  date: string;
+  time: string;
+  tags: string;
+}
 
 const EventList = () => {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false); 
 
@@ -28,7 +29,7 @@ const EventList = () => {
         time: item.time,
         tags: item.category.toLowerCase(),
       }));
-      setEvents(transformedEvents); // Update state with fetched events
+      setEvents((prevEvents) => [...prevEvents, ...transformedEvents]); // Update state with fetched events
     } catch (error) {
       console.error('Error fetching events:', error);
     } finally {
