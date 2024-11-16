@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, Modal } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
 const MyCalendar = () => {
