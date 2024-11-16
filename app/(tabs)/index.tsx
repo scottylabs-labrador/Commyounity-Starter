@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../AuthContext';
 
 interface Event {
   id: string;
@@ -15,12 +16,13 @@ const EventList = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false); 
+  const { username } = useAuth(); 
 
   const fetchEvents = async (pageNum: number) => {
     if (loading) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/eventlist/search?page=${pageNum}&page_size=10`); // Replace with your API endpoint
+      const response = await fetch(`http://127.0.0.1:8000/api/eventlist/search?page=${pageNum}&page_size=10&username=${username}`); // Replace with your API endpoint
       const data = await response.json();
       const transformedEvents = data.map((item: any) => ({
         id: item.id.toString(),
