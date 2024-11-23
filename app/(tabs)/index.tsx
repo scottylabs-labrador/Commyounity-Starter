@@ -1,16 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../AuthContext';
 
-const events = [
-  { id: '1', name: 'Charli xcx Concert', date: 'Oct 28, 2024', time: '7:00 PM', tags: 'concert • music' },
-  { id: '2', name: 'Haunted House', date: 'Oct 31, 2024', time: '6:00 PM', tags: 'seasonal • horror' },
-  { id: '3', name: 'Downtown Night Market', date: 'Nov 12, 2024', time: '5:30 PM', tags: 'shopping • games' },
-  { id: '4', name: 'Thanksgiving Parade', date: 'Nov 28, 2024', time: '12:00 PM', tags: 'seasonal • parade' },
-];
+interface Event {
+  id: string;
+  name: string;
+  date: string;
+  time: string;
+  tags: string;
+}
 
 const EventList = () => {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false); 
+  const { username } = useAuth(); 
+
+  const fetchEvents = async (pageNum: number) => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/eventlist/search?page=${pageNum}&page_size=10&username=${username}`); // Replace with your API endpoint
+      const data = await response.json();
+      const transformedEvents = data.map((item: any) => ({
+        id: item.id.toString(),
+        name: item.title,
+        date: `${item.month} ${item.day}, ${item.year || ''}`, // Format date using month and day
+        time: item.time,
+        tags: item.category.toLowerCase(),
+      }));
+      setEvents((prevEvents) => [...prevEvents, ...transformedEvents]); // Update state with fetched events
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setLoading(false); // Stop loading after fetching
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents(page);
+  }, [page]);
+
+  const handleEndReached = () => {
+    if (!loading) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+  
   const renderItem = ({ item }: any) => (
     <View style={styles.eventCard}>
       <View style={styles.eventTextContainer}>
@@ -28,6 +66,9 @@ const EventList = () => {
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
       style={styles.eventList}
+      onEndReached={handleEndReached}
+      onEndReachedThreshold={0.3} 
+      ListFooterComponent={loading ? <Text>Loading...</Text> : null} 
     />
   );
 };
