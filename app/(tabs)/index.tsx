@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,17 +12,30 @@ interface Event {
   tags: string;
 }
 
-const EventList = () => {
+interface EventListProps {
+  keyword: string;
+}
+
+const EventList = ({ keyword }: EventListProps) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false); 
   const { username } = useAuth(); 
+  const flatListRef = useRef<FlatList>(null);
 
   const fetchEvents = async (pageNum: number) => {
     if (loading) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/eventlist/search?page=${pageNum}&page_size=10&username=${username}`); // Replace with your API endpoint
+      const baseUrl = `http://127.0.0.1:8000/api/eventlist/search`;
+      const queryParams = `?page=${pageNum}&page_size=10`;
+      const usernameParam = username ? `&username=${username}` : "";
+      const keywordParam =  keyword ? `&q=${keyword}` : "";
+      console.log("keyword is ");
+      console.log(keyword);
+      const url = `${baseUrl}${queryParams}${usernameParam}${keywordParam}`;
+
+      const response = await fetch(url); // Replace with your API endpoint
       const data = await response.json();
       const transformedEvents = data.map((item: any) => ({
         id: item.id.toString(),
@@ -38,6 +51,14 @@ const EventList = () => {
       setLoading(false); // Stop loading after fetching
     }
   };
+
+  useEffect(() => {
+    setEvents([]);
+    setPage(1);
+    if (flatListRef.current) {
+      flatListRef.current.scrollToOffset({ animated: true, offset: 0 }); // Scroll to top when keyword changes
+    }
+  }, [keyword]);
 
   useEffect(() => {
     fetchEvents(page);
@@ -62,6 +83,7 @@ const EventList = () => {
 
   return (
     <FlatList
+      ref={flatListRef}
       data={events}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
@@ -74,19 +96,34 @@ const EventList = () => {
 };
 
 const App = () => {
+
+  const [keyword, setKeyword] = useState('');
+  const [query, setQuery] = useState('');
+
+  const handleInputChange = (input: string) => {
+    setKeyword(input);
+  };
+
+  const handleEnterKey = () => {
+    setQuery(keyword);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* logo and search bar */}
       <View style={styles.header}>
-        <TextInput
+      <TextInput
           style={styles.searchBar}
           placeholder="Search"
           placeholderTextColor="#999"
+          onChangeText={handleInputChange}
+          onSubmitEditing={handleEnterKey}
+          value={keyword}
         />
       </View>
 
       {/* list of events */}
-      <EventList />
+      <EventList keyword={query}/>
 
       {/* bottom bar */}
     </SafeAreaView>
