@@ -22,6 +22,7 @@ const EventList = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false); 
   const { username } = useAuth(); 
+  const [ended, setEnded] = useState(false); 
 
   const fetchEvents = async (pageNum: number) => {
     if (loading) return;
@@ -39,6 +40,7 @@ const EventList = () => {
       setEvents((prevEvents) => [...prevEvents, ...transformedEvents]); // Update state with fetched events
     } catch (error) {
       console.error('Error fetching events:', error);
+      setEnded(true);
     } finally {
       setLoading(false); // Stop loading after fetching
     }
@@ -49,7 +51,7 @@ const EventList = () => {
   }, [page]);
 
   const handleEndReached = () => {
-    if (!loading) {
+    if (!loading && !ended) {
       setPage((prevPage) => prevPage + 1);
     }
   };

@@ -20,6 +20,7 @@ const EventList = ({ keyword }: EventListProps) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false); 
+  const [ended, setEnded] = useState(false); 
   const { username } = useAuth(); 
   const flatListRef = useRef<FlatList>(null);
 
@@ -35,7 +36,7 @@ const EventList = ({ keyword }: EventListProps) => {
       console.log(keyword);
       const url = `${baseUrl}${queryParams}${usernameParam}${keywordParam}`;
 
-      const response = await fetch(url); // Replace with your API endpoint
+      const response = await fetch(url);
       const data = await response.json();
       const transformedEvents = data.map((item: any) => ({
         id: item.id.toString(),
@@ -47,6 +48,7 @@ const EventList = ({ keyword }: EventListProps) => {
       setEvents((prevEvents) => [...prevEvents, ...transformedEvents]); // Update state with fetched events
     } catch (error) {
       console.error('Error fetching events:', error);
+      setEnded(true);
     } finally {
       setLoading(false); // Stop loading after fetching
     }
@@ -54,18 +56,20 @@ const EventList = ({ keyword }: EventListProps) => {
 
   useEffect(() => {
     setEvents([]);
-    setPage(1);
+    setPage(0);
+    setEnded(false);
     if (flatListRef.current) {
       flatListRef.current.scrollToOffset({ animated: true, offset: 0 }); // Scroll to top when keyword changes
     }
   }, [keyword]);
 
   useEffect(() => {
-    fetchEvents(page);
+    if(page === 0) setPage(1);
+    else fetchEvents(page);
   }, [page]);
 
   const handleEndReached = () => {
-    if (!loading) {
+    if (!loading && !ended) {
       setPage((prevPage) => prevPage + 1);
     }
   };

@@ -11,7 +11,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Create a provider component
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [username, setUsername] = useState<string | null>("bbb");
+  const [username, setUsername] = useState<string | null>("");
 
   return (
     <AuthContext.Provider value={{ username, setUsername }}>

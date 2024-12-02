@@ -2,28 +2,59 @@ import React, { useState } from 'react';
 import {
   StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert,
 } from 'react-native';
+import { useAuth } from '../AuthContext';
 
 const LoginView: React.FC = () => {
   
-  const [email, setEmail] = useState<string | undefined>(undefined);
+  const [account, setAccount] = useState<string | undefined>(undefined);
   const [password, setPassword] = useState<string | undefined>(undefined);
+  const { username, setUsername } = useAuth();
 
   
   const showAlert = (viewId: string) => Alert.alert('Alert', 'Button pressed ' + viewId);
+
+  const handleLogin = async () => {
+    if (!account || !password) {
+      Alert.alert('Error', 'Please enter both email and password.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/check-account?username=${account}&password=${password}`);
+    
+      if (response.status === 200) {
+        const data = await response.json();
+        if (data.success) {
+          Alert.alert('Login Successful', 'Welcome back!');
+          setUsername(account);
+        } else {
+          Alert.alert('Login Failed', 'Invalid username or password.');
+        }
+      } else if (response.status === 404) {
+        Alert.alert('Error', 'User not found.');
+      } else if (response.status === 401) {
+        Alert.alert('Error', 'User not found.');
+      } else {
+        Alert.alert('Login Failed', 'Invalid username or password.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      Alert.alert('Error', 'Could not connect to the server.');
+    }
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <Image
           style={styles.inputIcon}
-          source={{ uri: 'https://img.icons8.com/ios-filled/512/circled-envelope.png' }}
+          source={{ uri: 'https://img.icons8.com/?size=100&id=11795&format=png&color=000000' }}
         />
         <TextInput
           style={styles.inputs}
-          placeholder="Email"
-          keyboardType="email-address"
+          placeholder="Account"
           underlineColorAndroid="transparent"
-          onChangeText={text => setEmail(text)}
+          onChangeText={text => setAccount(text)}
         />
       </View>
 
@@ -43,7 +74,7 @@ const LoginView: React.FC = () => {
 
       <TouchableOpacity
         style={[styles.buttonContainer, styles.loginButton]}
-        onPress={() => showAlert('login')}>
+        onPress={handleLogin}>
         <Text style={styles.loginText}>Login</Text>
       </TouchableOpacity>
 
