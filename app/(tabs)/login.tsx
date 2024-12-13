@@ -3,13 +3,14 @@ import {
   StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert,
 } from 'react-native';
 import { useAuth } from '../AuthContext';
+import { useNavigation } from '@react-navigation/native';
 
 const LoginView: React.FC = () => {
   
   const [account, setAccount] = useState<string | undefined>(undefined);
   const [password, setPassword] = useState<string | undefined>(undefined);
   const { username, setUsername } = useAuth();
-
+  const navigation = useNavigation();
   
   const showAlert = (viewId: string) => Alert.alert('Alert', 'Button pressed ' + viewId);
 
@@ -23,13 +24,9 @@ const LoginView: React.FC = () => {
       const response = await fetch(`http://127.0.0.1:8000/api/check-account?username=${account}&password=${password}`);
     
       if (response.status === 200) {
-        const data = await response.json();
-        if (data.success) {
-          Alert.alert('Login Successful', 'Welcome back!');
-          setUsername(account);
-        } else {
-          Alert.alert('Login Failed', 'Invalid username or password.');
-        }
+        Alert.alert('Login Successful', 'Welcome back!');
+        setUsername(account);
+        navigation.navigate("index");
       } else if (response.status === 404) {
         Alert.alert('Error', 'User not found.');
       } else if (response.status === 401) {

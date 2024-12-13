@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../AuthContext';
+import {useSegments} from 'expo-router'
 
 // const events = [
 //   { id: '1', name: 'Charli xcx Concert', date: 'Oct 28, 2024', time: '7:00 PM', tags: 'concert • music' },
@@ -23,6 +24,8 @@ const EventList = () => {
   const [loading, setLoading] = useState(false); 
   const { username } = useAuth(); 
   const [ended, setEnded] = useState(false); 
+  const flatListRef = useRef<FlatList>(null);
+  const segments = useSegments()
 
   const fetchEvents = async (pageNum: number) => {
     if (loading) return;
@@ -47,8 +50,18 @@ const EventList = () => {
   };
 
   useEffect(() => {
-    fetchEvents(page);
+    if(page === 0) setPage(1);
+    else fetchEvents(page);
   }, [page]);
+
+  useEffect(() => {
+    setEvents([]);
+    setPage(0);
+    setEnded(false);
+    if (flatListRef.current) {
+      flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
+    }
+   }, [segments])
 
   const handleEndReached = () => {
     if (!loading && !ended) {

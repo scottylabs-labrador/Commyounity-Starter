@@ -65,3 +65,35 @@ def update_user_events(request):
         return Response({"message": "User events updated successfully"}, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+# http://127.0.0.1:8000/api/add-likes/?username=bbb&event=10&action=add
+@api_view(['GET'])
+def add_user_event(request):
+    username = request.query_params.get('username', None);
+    event = request.query_params.get('event', None);
+    action = request.query_params.get('action', None);
+
+    if not username:
+        return Response({"error": "Username is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not event:
+        return Response({"error": "Event ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not action:
+        return Response({"error": "Event ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(username=username)
+        if action == "add":
+            if event not in user.events:
+                user.events.append(event)
+        elif action == "remove":
+            if event in user.events:
+                user.events.remove(event)
+        else:
+            return Response({"error": "Action invalid."}, status=status.HTTP_400_BAD_REQUEST)
+        user.save()
+
+        return Response({"message": "User events updated successfully"}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)

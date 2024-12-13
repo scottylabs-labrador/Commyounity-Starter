@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 interface Event {
   id: string;
@@ -10,6 +11,7 @@ interface Event {
   date: string;
   time: string;
   tags: string;
+  liked: boolean;
 }
 
 interface EventListProps {
@@ -32,8 +34,6 @@ const EventList = ({ keyword }: EventListProps) => {
       const queryParams = `?page=${pageNum}&page_size=10`;
       const usernameParam = username ? `&username=${username}` : "";
       const keywordParam =  keyword ? `&q=${keyword}` : "";
-      console.log("keyword is ");
-      console.log(keyword);
       const url = `${baseUrl}${queryParams}${usernameParam}${keywordParam}`;
 
       const response = await fetch(url);
@@ -44,6 +44,7 @@ const EventList = ({ keyword }: EventListProps) => {
         date: `${item.month} ${item.day}, ${item.year || ''}`, // Format date using month and day
         time: item.time,
         tags: item.category.toLowerCase(),
+        liked: false,
       }));
       setEvents((prevEvents) => [...prevEvents, ...transformedEvents]); // Update state with fetched events
     } catch (error) {
@@ -64,6 +65,15 @@ const EventList = ({ keyword }: EventListProps) => {
   }, [keyword]);
 
   useEffect(() => {
+    setEvents([]);
+    setPage(0);
+    setEnded(false);
+    if (flatListRef.current) {
+      flatListRef.current.scrollToOffset({ animated: true, offset: 0 }); // Scroll to top when keyword changes
+    }
+  }, [username]);
+
+  useEffect(() => {
     if(page === 0) setPage(1);
     else fetchEvents(page);
   }, [page]);
@@ -71,6 +81,43 @@ const EventList = ({ keyword }: EventListProps) => {
   const handleEndReached = () => {
     if (!loading && !ended) {
       setPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const toggleLike = async (eventId: string) => {
+    setEvents((prevEvents) =>
+      prevEvents.map((event) =>
+        event.id === eventId ? { ...event, liked: !event.liked } : event
+      )
+    );
+    
+    const eventToUpdate = events.find((event) => event.id === eventId);
+    if (!eventToUpdate) return;
+  
+    const action = eventToUpdate.liked ? "remove" : "add"; // Determine the action based on the current state
+  
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/add-likes/?username=${username}&event=${eventId}&action=${action}`
+      );
+  
+      if (!response.ok) {
+        console.error("Failed to update like status on the server");
+        // Revert the change in case of an error
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === eventId ? { ...event, liked: !event.liked } : event
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error while updating like status:", error);
+      // Revert the change in case of an error
+      setEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event.id === eventId ? { ...event, liked: !event.liked } : event
+        )
+      );
     }
   };
   
@@ -82,6 +129,13 @@ const EventList = ({ keyword }: EventListProps) => {
         <Text style={styles.eventTime}>{item.time}</Text>
         <Text style={styles.eventTags}>{item.tags}</Text>
       </View>
+      <TouchableOpacity onPress={() => toggleLike(item.id)}>
+        <Ionicons
+          name={item.liked ? 'heart' : 'heart-outline'}
+          size={24}
+          color={item.liked ? 'red' : 'gray'}
+        />
+      </TouchableOpacity>
     </View>
   );
 
