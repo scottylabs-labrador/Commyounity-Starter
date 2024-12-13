@@ -16,11 +16,11 @@ export default function TabLayout() {
         headerShown: false,
       }}>
         <Tabs.Screen
-        name="index"
+        name="events"
         options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+            <TabBarIcon name={'home'} color={color} />
           ),
         }}
       />
@@ -42,7 +42,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* <Tabs.Screen
+      <Tabs.Screen
         name="friends"
         options={{
           title: 'Friends',
@@ -50,8 +50,8 @@ export default function TabLayout() {
             <FontAwesome name={'users'} size = {24} color={color} />
           ),
         }}
-      /> */}
-      {/* <Tabs.Screen
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
@@ -59,8 +59,8 @@ export default function TabLayout() {
             <FontAwesome name={'user'} size = {24} color={color} />
           ),
         }}
-      /> */}
-      <Tabs.Screen
+      />
+      {/* <Tabs.Screen
         name="login"
         options={{
           title: 'Login',
@@ -68,7 +68,7 @@ export default function TabLayout() {
             <FontAwesome name={'key'} size = {24} color={color} />
           ),
         }}
-      />
+      /> */}
     </Tabs>
   );
 }

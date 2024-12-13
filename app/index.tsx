@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import {
   StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert,
 } from 'react-native';
-import { useAuth } from '../AuthContext';
+import { useAuth } from './AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 
 const LoginView: React.FC = () => {
   
@@ -11,6 +12,7 @@ const LoginView: React.FC = () => {
   const [password, setPassword] = useState<string | undefined>(undefined);
   const { username, setUsername } = useAuth();
   const navigation = useNavigation();
+  const router = useRouter();
   
   const showAlert = (viewId: string) => Alert.alert('Alert', 'Button pressed ' + viewId);
 
@@ -26,7 +28,7 @@ const LoginView: React.FC = () => {
       if (response.status === 200) {
         Alert.alert('Login Successful', 'Welcome back!');
         setUsername(account);
-        navigation.navigate("index");
+        router.push('events');
       } else if (response.status === 404) {
         Alert.alert('Error', 'User not found.');
       } else if (response.status === 401) {
@@ -40,29 +42,30 @@ const LoginView: React.FC = () => {
     }
   };
 
+  const handleSignup = async () => {
+    router.push('signup');
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <Image
-          style={styles.inputIcon}
-          source={{ uri: 'https://img.icons8.com/?size=100&id=11795&format=png&color=000000' }}
-        />
+
+      <Text style={styles.title}>
+        Comm-<Text style={styles.highlight}>YOU</Text>-nity
+      </Text>
+
+      <View style={styles.form}>
+        <Text style={styles.label}>Name</Text>
         <TextInput
-          style={styles.inputs}
-          placeholder="Account"
+          style={styles.input}
+          placeholder="name"
           underlineColorAndroid="transparent"
           onChangeText={text => setAccount(text)}
         />
-      </View>
 
-      <View style={styles.inputContainer}>
-        <Image
-          style={styles.inputIcon}
-          source={{ uri: 'https://img.icons8.com/ios-glyphs/512/key.png' }}
-        />
+        <Text style={styles.label}>Password</Text>
         <TextInput
-          style={styles.inputs}
-          placeholder="Password"
+          style={styles.input}
+          placeholder="password"
           secureTextEntry={true}
           underlineColorAndroid="transparent"
           onChangeText={text => setPassword(text)}
@@ -70,20 +73,20 @@ const LoginView: React.FC = () => {
       </View>
 
       <TouchableOpacity
-        style={[styles.buttonContainer, styles.loginButton]}
+        style={styles.button}
         onPress={handleLogin}>
-        <Text style={styles.loginText}>Login</Text>
+        <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.buttonContainer}
+        style={styles.link}
         onPress={() => showAlert('forgot password')}>
         <Text>Forgot your password?</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.buttonContainer}
-        onPress={() => showAlert('sign up')}>
+        style={styles.link}
+        onPress={handleSignup}>
         <Text>Sign up</Text>
       </TouchableOpacity>
     </View>
@@ -95,45 +98,68 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
   },
-  inputContainer: {
-    borderBottomColor: '#F5FCFF',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 30,
-    borderBottomWidth: 1,
-    width: 250,
-    height: 45,
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#000',
     marginBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
   },
-  inputs: {
-    height: 45,
-    marginLeft: 16,
-    borderBottomColor: '#FFFFFF',
-    flex: 1,
+  highlight: {
+    color: '#7D4DFF',
   },
-  inputIcon: {
-    width: 30,
-    height: 30,
-    marginLeft: 15,
-    justifyContent: 'center',
-  },
-  buttonContainer: {
-    height: 45,
-    flexDirection: 'row',
+  emojiContainer: {
+    backgroundColor: '#FFFFCC',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 30,
+  },
+  emoji: {
+    fontSize: 40,
+  },
+  form: {
+    width: '100%',
     marginBottom: 20,
-    width: 250,
-    borderRadius: 30,
   },
-  loginButton: {
-    backgroundColor: '#00b5ec',
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 5,
+    color: '#000',
   },
-  loginText: {
-    color: 'white',
+  input: {
+    backgroundColor: '#F9F9F9',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#DDD',
+    marginBottom: 15,
+    color: '#000',
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: '#E0D8F9',
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+    paddingVertical: 15,
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: '#7D4DFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  link: {
+    color: '#C1A6F1',
+    fontSize: 14,
+    marginTop: 10,
   },
 });
 
