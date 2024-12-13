@@ -3,31 +3,29 @@ import {
   StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert,
 } from 'react-native';
 import { useAuth } from './AuthContext';
-import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 
 const LoginView: React.FC = () => {
   
-  const [account, setAccount] = useState<string | undefined>(undefined);
+  const [username, setUsername] = useState<string | undefined>(undefined);
   const [password, setPassword] = useState<string | undefined>(undefined);
-  const { username, setUsername } = useAuth();
-  const navigation = useNavigation();
+  const { account, setAccount } = useAuth();
   const router = useRouter();
   
   const showAlert = (viewId: string) => Alert.alert('Alert', 'Button pressed ' + viewId);
 
   const handleLogin = async () => {
-    if (!account || !password) {
+    if (!username || !password) {
       Alert.alert('Error', 'Please enter both email and password.');
       return;
     }
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/check-account?username=${account}&password=${password}`);
+      const response = await fetch(`http://127.0.0.1:8000/api/check-account?username=${username}&password=${password}`);
     
       if (response.status === 200) {
         Alert.alert('Login Successful', 'Welcome back!');
-        setUsername(account);
+        setAccount(username);
         router.push('events');
       } else if (response.status === 404) {
         Alert.alert('Error', 'User not found.');
@@ -59,7 +57,7 @@ const LoginView: React.FC = () => {
           style={styles.input}
           placeholder="name"
           underlineColorAndroid="transparent"
-          onChangeText={text => setAccount(text)}
+          onChangeText={text => setUsername(text)}
         />
 
         <Text style={styles.label}>Password</Text>

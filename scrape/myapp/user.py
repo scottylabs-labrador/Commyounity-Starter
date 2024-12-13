@@ -6,6 +6,10 @@ from .serializers import UserSerializer
 from django.contrib.auth.hashers import check_password
 
 # http://127.0.0.1:8000/api/create-account/
+# {
+#    "username":"username",
+#    "password":"password"
+# }
 @api_view(['POST'])
 def create_user_account(request):
     serializer = UserSerializer(data=request.data)

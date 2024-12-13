@@ -2,8 +2,8 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Define the shape of the context data
 interface AuthContextType {
-  username: string | null;
-  setUsername: (username: string | null) => void;
+  account: string | null;
+  setAccount: (account: string | null) => void;
 }
 
 // Create the context with an empty default value
@@ -11,10 +11,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Create a provider component
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [username, setUsername] = useState<string | null>("");
+  const [account, setAccount] = useState<string | null>("");
 
   return (
-    <AuthContext.Provider value={{ username, setUsername }}>
+    <AuthContext.Provider value={{ account, setAccount }}>
       {children}
     </AuthContext.Provider>
   );
