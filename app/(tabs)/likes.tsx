@@ -22,7 +22,7 @@ const EventList = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false); 
-  const { username } = useAuth(); 
+  const { account } = useAuth(); 
   const [ended, setEnded] = useState(false); 
   const flatListRef = useRef<FlatList>(null);
   const segments = useSegments()
@@ -31,7 +31,7 @@ const EventList = () => {
     if (loading) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/get-likes/?username=${username}&page=${pageNum}`); // Replace with your API endpoint
+      const response = await fetch(`http://127.0.0.1:8000/api/get-likes/?username=${account}&page=${pageNum}`); // Replace with your API endpoint
       const data = await response.json();
       const transformedEvents = data.map((item: any) => ({
         id: item.id.toString(),

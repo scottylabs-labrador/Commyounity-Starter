@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+import uuid
 
 class Events(models.Model):
     title = models.CharField(max_length=255)
@@ -14,8 +15,11 @@ class Events(models.Model):
         return self.title
 
 class User(models.Model):
-    username = models.CharField(max_length=100, unique=True)
+    username = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    nickname = models.CharField(max_length=100, default='User')
     password = models.CharField(max_length=100)
+    email = models.CharField(max_length=100, unique=True, default='default@example.com')
+    verified = models.BooleanField(default=False)
     preference = ArrayField(models.CharField(max_length=100), blank=True, default=list)
     events = ArrayField(models.IntegerField(), blank=True, default=list)
 

@@ -23,7 +23,7 @@ const EventList = ({ keyword }: EventListProps) => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false); 
   const [ended, setEnded] = useState(false); 
-  const { username } = useAuth(); 
+  const { account } = useAuth(); 
   const flatListRef = useRef<FlatList>(null);
 
   const fetchEvents = async (pageNum: number) => {
@@ -32,7 +32,7 @@ const EventList = ({ keyword }: EventListProps) => {
     try {
       const baseUrl = `http://127.0.0.1:8000/api/eventlist/search`;
       const queryParams = `?page=${pageNum}&page_size=10`;
-      const usernameParam = username ? `&username=${username}` : "";
+      const usernameParam = account ? `&username=${account}` : "";
       const keywordParam =  keyword ? `&q=${keyword}` : "";
       const url = `${baseUrl}${queryParams}${usernameParam}${keywordParam}`;
 
@@ -71,7 +71,7 @@ const EventList = ({ keyword }: EventListProps) => {
     if (flatListRef.current) {
       flatListRef.current.scrollToOffset({ animated: true, offset: 0 }); // Scroll to top when keyword changes
     }
-  }, [username]);
+  }, [account]);
 
   useEffect(() => {
     if(page === 0) setPage(1);
@@ -98,7 +98,7 @@ const EventList = ({ keyword }: EventListProps) => {
   
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/add-likes/?username=${username}&event=${eventId}&action=${action}`
+        `http://127.0.0.1:8000/api/add-likes/?username=${account}&event=${eventId}&action=${action}`
       );
   
       if (!response.ok) {

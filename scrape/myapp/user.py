@@ -7,8 +7,8 @@ from django.contrib.auth.hashers import check_password
 
 # http://127.0.0.1:8000/api/create-account/
 # {
-#    "username":"username",
-#    "password":"password"
+#    "password":"password",
+#    "email":"email"
 # }
 @api_view(['POST'])
 def create_user_account(request):
@@ -16,7 +16,7 @@ def create_user_account(request):
     if serializer.is_valid(): # serializer helps to validate data
         serializer.save()
         return Response({"message": "User account created successfully"}, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) # username collision, no pw, etc.
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # http://127.0.0.1:8000/api/check-account?username=user&password=password
 @api_view(['GET'])
@@ -33,6 +33,8 @@ def check_user_account(request):
         return Response({"message": "Login successful!"}, status=status.HTTP_200_OK)
     else:
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
 
 # http://127.0.0.1:8000/api/update-preference/?username=bbb&preference={%22TRAVEL%22,%22ATHLETIC%22}
 @api_view(['GET'])
