@@ -11,6 +11,7 @@ npm-debug.*
 web-build/
 scrape/scrape/__pycache__/
 scrape/myapp/__pycache__/
+scrape/myapp/migrations/
 
 # macOS
 .DS_Store
