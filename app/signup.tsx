@@ -14,16 +14,16 @@ export default function SignUpScreen() {
 
     const handleSignup = async () => {
         if (!email || !email2) {
-            Alert.alert('Error', 'Please enter email');
+            window.alert('Please enter email');
             return;
         } else if (!(email === email2)) {
-            Alert.alert('Error', 'Email does not match');
+            window.alert('Email does not match');
             return;
         } else if (!password || !password2) {
-            Alert.alert('Error', 'Please enter password');
+            window.alert('Please enter password');
             return;
         } else if (!(password === password2)) {
-            Alert.alert('Error', 'Password does not match');
+            window.alert('Password does not match');
             return;
         } 
     
@@ -44,18 +44,18 @@ export default function SignUpScreen() {
             
             const data = await response.json();
             if (response.status === 201) {
-                Alert.alert('Sign up Successful', 'Welcome!');
+                window.alert('Welcome!');
                 
             } else if (response.status === 400) {
                 console.log(data.error);
-                Alert.alert('Sign up Failed', 'User already exists');
+                window.alert('User already exists');
             } else {
                 console.log(data.error);
-                Alert.alert('Signing up Failed', 'Cannot sign up.');
+                window.alert('Cannot sign up.');
             }
         } catch (error) {
             console.error('Login error:', error);
-            Alert.alert('Error', 'Could not connect to the server.');
+            window.alert('Could not connect to the server.');
         }
 
         if(!account){
