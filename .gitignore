@@ -1,6 +1,12 @@
 node_modules/
 .expo/
+.vscode/
+.env
+.env.*
 dist/
+venv/
+env/
+__pycache__/
 npm-debug.*
 *.jks
 *.p8
@@ -8,6 +14,11 @@ npm-debug.*
 *.key
 *.mobileprovision
 *.orig.*
+*.pyc
+*.pyo
+*.pyd
+*.log
+
 web-build/
 
 # macOS
