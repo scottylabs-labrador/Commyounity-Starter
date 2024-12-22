@@ -2,21 +2,18 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Image, TouchableOpacity, Alert} from 'react-native';
 import { useAuth } from './AuthContext';
 import { useRouter } from 'expo-router';
+import { send, EmailJSResponseStatus } from '@emailjs/react-native';
 
 export default function SignUpScreen() {
-    const [username, setUsername] = useState<string | undefined>(undefined);
     const [email, setEmail] = useState<string | undefined>(undefined);
     const [email2, setEmail2] = useState<string | undefined>(undefined);
     const [password, setPassword] = useState<string | undefined>(undefined);
     const [password2, setPassword2] = useState<string | undefined>(undefined);
-    const { account, setAccount } = useAuth();
+    const [account, setAccount] = useState<string | undefined>(undefined);
     const router = useRouter();
 
     const handleSignup = async () => {
-        if (!username) {
-            Alert.alert('Error', 'Please enter name');
-            return;
-        } else if (!email || !email2) {
+        if (!email || !email2) {
             Alert.alert('Error', 'Please enter email');
             return;
         } else if (!(email === email2)) {
@@ -32,8 +29,8 @@ export default function SignUpScreen() {
     
         const url = 'http://127.0.0.1:8000/api/create-account/';
         const payload = {
-            username,
             password,
+            email
         };
         try {
             console.log(JSON.stringify(payload));
@@ -44,22 +41,45 @@ export default function SignUpScreen() {
                 },
                 body: JSON.stringify(payload),
               });
-        
+            
+            const data = await response.json();
             if (response.status === 201) {
                 Alert.alert('Sign up Successful', 'Welcome!');
-                setAccount(username);
-                router.push('events');
+                
             } else if (response.status === 400) {
-                console.log("Username already exists");
-                Alert.alert('Sign up Failed', 'Username already exists');
+                console.log(data.error);
+                Alert.alert('Sign up Failed', 'User already exists');
             } else {
-                console.log(response.status);
-                console.log("Signing up Failed");
+                console.log(data.error);
                 Alert.alert('Signing up Failed', 'Cannot sign up.');
             }
         } catch (error) {
             console.error('Login error:', error);
             Alert.alert('Error', 'Could not connect to the server.');
+        }
+
+        if(!account){
+          try {
+            await send(
+              'service_7jcyohr',
+              'template_xbothcd',
+              {
+                account,
+                email,
+              },
+              {
+                publicKey: 'Md2K_RS0-RqCWFvBu',
+              },
+            );
+            // router.push('events');
+            console.log('SUCCESS!');
+          } catch (err) {
+            if (err instanceof EmailJSResponseStatus) {
+              console.log('EmailJS Request Failed...', err);
+            }
+      
+            console.log('ERROR', err);
+          }
         }
       };
 
@@ -72,14 +92,6 @@ export default function SignUpScreen() {
 
       {/* Form Section */}
       <View style={styles.form}>
-        <Text style={styles.label}>Name</Text>
-        <TextInput 
-            style={styles.input} 
-            placeholder="name" 
-            placeholderTextColor="#aaa" 
-            onChangeText={text => setUsername(text)}
-            />
-
         <Text style={styles.label}>Email</Text>
         <TextInput 
             style={styles.input} 

@@ -4,18 +4,23 @@ from rest_framework.decorators import api_view
 from .models import User
 from .serializers import UserSerializer
 from django.contrib.auth.hashers import check_password
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from uuid import UUID
 
 # http://127.0.0.1:8000/api/create-account/
 # {
 #    "password":"password",
 #    "email":"email"
 # }
-@api_view(['POST'])
 def create_user_account(request):
     serializer = UserSerializer(data=request.data)
-    if serializer.is_valid(): # serializer helps to validate data
-        serializer.save()
-        return Response({"message": "User account created successfully"}, status=status.HTTP_201_CREATED)
+    if serializer.is_valid():  # Validate the data
+        user = serializer.save()  # Save and get the user instance
+        return Response({
+            "message": "User account created successfully",
+            "username": user.username  # Include the generated username (UUID)
+        }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # http://127.0.0.1:8000/api/check-account?username=user&password=password
@@ -34,7 +39,17 @@ def check_user_account(request):
     else:
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-
+# http://127.0.0.1:8000/api/check-account?username=user&password=password
+@api_view(['GET'])
+def verify_email(request):
+    account = request.query_params.get('account', None);
+    if not account:
+        return Response({"error": "Username is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user = get_object_or_404(User, username=account);
+    user.verified = True;
+    user.save()
+    return JsonResponse({'message': 'Email verified successfully!'})
 
 # http://127.0.0.1:8000/api/update-preference/?username=bbb&preference={%22TRAVEL%22,%22ATHLETIC%22}
 @api_view(['GET'])
