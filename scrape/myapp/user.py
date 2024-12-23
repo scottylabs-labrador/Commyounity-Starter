@@ -13,6 +13,7 @@ from uuid import UUID
 #    "password":"password",
 #    "email":"email"
 # }
+@api_view(['POST']) 
 def create_user_account(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():  # Validate the data
@@ -23,19 +24,22 @@ def create_user_account(request):
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# http://127.0.0.1:8000/api/check-account?username=user&password=password
+# http://127.0.0.1:8000/api/check-account?email=email&password=password
 @api_view(['GET'])
 def check_user_account(request):
-    username = request.query_params.get('username', None);
+    email = request.query_params.get('email', None);
     password = request.query_params.get('password', None);
     
     try:
-        user = User.objects.get(username=username);
+        user = User.objects.get(email=email);
     except User.DoesNotExist:
         return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
     if check_password(password, user.password): # django's dehashing function
-        return Response({"message": "Login successful!"}, status=status.HTTP_200_OK)
+        return Response({
+            "message": "Login successful!",
+            "username": user.username
+        }, status=status.HTTP_200_OK)
     else:
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 

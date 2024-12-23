@@ -7,7 +7,7 @@ import { useRouter } from 'expo-router';
 
 const LoginView: React.FC = () => {
   
-  const [username, setUsername] = useState<string | undefined>(undefined);
+  const [email, setEmail] = useState<string | undefined>(undefined);
   const [password, setPassword] = useState<string | undefined>(undefined);
   const { account, setAccount } = useAuth();
   const router = useRouter();
@@ -15,17 +15,18 @@ const LoginView: React.FC = () => {
   const showAlert = (viewId: string) => Alert.alert('Alert', 'Button pressed ' + viewId);
 
   const handleLogin = async () => {
-    if (!username || !password) {
+    if (!email || !password) {
       Alert.alert('Error', 'Please enter both email and password.');
       return;
     }
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/check-account?username=${username}&password=${password}`);
+      const response = await fetch(`http://127.0.0.1:8000/api/check-account?email=${email}&password=${password}`);
     
       if (response.status === 200) {
         Alert.alert('Login Successful', 'Welcome back!');
-        setAccount(username);
+        const data = await response.json();
+        setAccount(data.username)
         router.push('events');
       } else if (response.status === 404) {
         Alert.alert('Error', 'User not found.');
@@ -52,12 +53,12 @@ const LoginView: React.FC = () => {
       </Text>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Name</Text>
+        <Text style={styles.label}>email</Text>
         <TextInput
           style={styles.input}
-          placeholder="name"
+          placeholder="email"
           underlineColorAndroid="transparent"
-          onChangeText={text => setUsername(text)}
+          onChangeText={text => setEmail(text)}
         />
 
         <Text style={styles.label}>Password</Text>
@@ -74,12 +75,6 @@ const LoginView: React.FC = () => {
         style={styles.button}
         onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.link}
-        onPress={() => showAlert('forgot password')}>
-        <Text>Forgot your password?</Text>
       </TouchableOpacity>
 
       <TouchableOpacity

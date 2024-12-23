@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { StyleSheet, Text, TextInput, View, Image, TouchableOpacity, Alert} from 'react-native';
 import { useAuth } from './AuthContext';
 import { useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import { send, EmailJSResponseStatus } from '@emailjs/react-native';
 
 export default function SignUpScreen() {
@@ -10,6 +11,7 @@ export default function SignUpScreen() {
     const [password, setPassword] = useState<string | undefined>(undefined);
     const [password2, setPassword2] = useState<string | undefined>(undefined);
     const [account, setAccount] = useState<string | undefined>(undefined);
+    const navigation = useNavigation();
     const router = useRouter();
 
     const handleSignup = async () => {
@@ -33,7 +35,6 @@ export default function SignUpScreen() {
             email
         };
         try {
-            console.log(JSON.stringify(payload));
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -44,44 +45,39 @@ export default function SignUpScreen() {
             
             const data = await response.json();
             if (response.status === 201) {
-                window.alert('Welcome!');
-                
+              try {
+                await send(
+                  'service_7jcyohr',
+                  'template_xbothcd',
+                  {
+                    account: data.username,
+                  },
+                  {
+                    publicKey: 'Md2K_RS0-RqCWFvBu',
+                  },
+                );
+                window.alert('Verification code sent to email, please check it out');
+              } catch (err) {
+                if (err instanceof EmailJSResponseStatus) {
+                  window.alert('Failed to send verification email');
+                } else {
+                  window.alert(err);
+                }
+              }
             } else if (response.status === 400) {
-                console.log(data.error);
                 window.alert('User already exists');
             } else {
-                console.log(data.error);
                 window.alert('Cannot sign up.');
             }
         } catch (error) {
             console.error('Login error:', error);
             window.alert('Could not connect to the server.');
         }
-
-        if(!account){
-          try {
-            await send(
-              'service_7jcyohr',
-              'template_xbothcd',
-              {
-                account,
-                email,
-              },
-              {
-                publicKey: 'Md2K_RS0-RqCWFvBu',
-              },
-            );
-            // router.push('events');
-            console.log('SUCCESS!');
-          } catch (err) {
-            if (err instanceof EmailJSResponseStatus) {
-              console.log('EmailJS Request Failed...', err);
-            }
-      
-            console.log('ERROR', err);
-          }
-        }
       };
+
+    const handleLogin = async () => {
+      navigation.navigate("index");
+    };
 
     return (
     <View style={styles.container}>
@@ -132,6 +128,12 @@ export default function SignUpScreen() {
       style={styles.button}
       onPress={handleSignup}>
         <Text style={styles.buttonText}>Sign up</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.link}
+        onPress={handleLogin}>
+        <Text>Log in</Text>
       </TouchableOpacity>
     </View>
   );
