@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { useAuth } from './AuthContext';
 import { useRouter } from 'expo-router';
+import SmileyFace from '@/components/SmileyFace';
 
 const LoginView: React.FC = () => {
   
@@ -51,6 +52,7 @@ const LoginView: React.FC = () => {
       <Text style={styles.title}>
         Comm-<Text style={styles.highlight}>YOU</Text>-nity
       </Text>
+      <SmileyFace/>
 
       <View style={styles.form}>
         <Text style={styles.label}>email</Text>

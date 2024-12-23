@@ -1,123 +1,141 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons'; 
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React from "react";
+import SmileyFace from "@/components/SmileyFace";
+import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 
-const pastEvents = [
-    { id: '2', name: 'Haunted House', date: 'Oct 31, 2024', time: '6:00 PM', tags: 'seasonal • horror' },       
-    { id: '3', name: 'Downtown Night Market', date: 'Nov 12, 2024', time: '5:30 PM', tags: 'shopping • games' },
-];
-
-const interests = [
-    { id: "performing arts"},
-    { id: " music"}, 
-    { id: "sports" }
-];
-
-
-
-const EventList = () => {
-  const renderItem = ({ item }: any) => (
-    <View style={styles.eventCard}>
-      <View style={styles.eventTextContainer}>
-        <Text style={styles.eventName}>{item.name}</Text>
-        <Text style={styles.eventDate}>{item.date}</Text>
-        <Text style={styles.eventTime}>{item.time}</Text>
-        <Text style={styles.eventTags}>{item.tags}</Text>
-      </View>
-    </View>
-  );
-
+const ProfileScreen = () => {
   return (
-    <FlatList
-      data={pastEvents}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      style={styles.eventList}
-    />
-  );
-};
-
-const App = () => {
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* logo and search bar */}
-      <View style={styles.header}>
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search"
-          placeholderTextColor="#999"
-        />
+    <ScrollView contentContainerStyle={styles.container}>
+      {/* Profile Header */}
+      <View style={styles.profileHeader}>
+        <View style={styles.profilePicture}>
+          <SmileyFace/>
+        </View>
+        <Text style={styles.username}>@Username</Text>
+        <Text style={styles.bio}>
+          Biography: Hi my name is and I am currently a student at plz hmu if yall are interested
+          in going to together! insta: @
+        </Text>
       </View>
 
-      {/* list of events */}
-      <EventList />
+      {/* Buttons */}
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity style={[styles.button, styles.shareButton]}>
+          <Text style={styles.buttonText}>Share Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.editButton]}>
+          <Text style={styles.buttonText}>Edit Profile</Text>
+        </TouchableOpacity>
+      </View>
 
-      {/* bottom bar */}
-    </SafeAreaView>
+      {/* Past Events */}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>My past events</Text>
+        <ScrollView horizontal={true}>
+          <View style={styles.grid}>
+            <View style={styles.gridItem} />
+            <View style={styles.gridItem} />
+            <View style={styles.gridItem} />
+            <View style={styles.gridItem} />
+            <View style={styles.gridItem} />
+          </View>
+        </ScrollView>
+      </View>
+
+      {/* Interests */}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>My interests</Text>
+        <ScrollView horizontal={true}>
+          <View style={styles.grid}>
+            <View style={styles.gridItem} />
+            <View style={styles.gridItem} />
+            <View style={styles.gridItem} />
+            <View style={styles.gridItem} />
+            <View style={styles.gridItem} />
+          </View>
+        </ScrollView>
+      </View>
+
+    </ScrollView>
   );
 };
-
-export default App;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
+    padding: 20,
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  profileHeader: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  profilePicture: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "#E9FFCA",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  username: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  bio: {
+    fontSize: 14,
+    color: "#555",
+    textAlign: "center"
+  },
+  buttonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 7,
+  },
+  button: {
+    paddingVertical: 10,
     paddingHorizontal: 20,
-    paddingTop: 10,
-  },
-  searchBar: {
-    flex: 1,
-    backgroundColor: '#EFEFEF',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 25,
-  },
-  eventList: {
-    marginHorizontal: 20,
-    marginTop: 10,
-  },
-  eventCard: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    padding: 15,
     borderRadius: 10,
-    marginBottom: 15,
+    marginHorizontal: 10,
   },
-  eventTextContainer: {
-    marginLeft: 15,
-    flex: 1,
+  shareButton: {
+    backgroundColor: "#4A61DD",
   },
-  eventName: {
+  editButton: {
+    backgroundColor: "#4A61DD",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  sectionContainer: {
+   
+  },
+  sectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+    marginVertical: 5,
   },
-  eventDate: {
-    fontSize: 14,
-    color: '#555555',
-    marginTop: 5,
+  grid: {
+    flexDirection: "row",
+    flexWrap: 'wrap',
+    justifyContent: "space-between",
+    marginBottom: 10,
   },
-  eventTime: {
-    fontSize: 14,
-    color: '#555555',
-    marginTop: 5,
+  gridItem: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    backgroundColor: "#E0D7F9",
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 5,
   },
-  eventTags: {
-    fontSize: 12,
-    color: '#999999',
-    marginTop: 5,
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderTopColor: '#CCCCCC',
-    borderTopWidth: 1,
+  gridText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#555",
   },
 });
+
+export default ProfileScreen;
