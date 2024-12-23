@@ -123,6 +123,7 @@ const EventList = ({ keyword }: EventListProps) => {
   
   const renderItem = ({ item }: any) => (
     <View style={styles.eventCard}>
+      <View style={styles.eventImage}></View>
       <View style={styles.eventTextContainer}>
         <Text style={styles.eventName}>{item.name}</Text>
         <Text style={styles.eventDate}>{item.date}</Text>
@@ -131,9 +132,9 @@ const EventList = ({ keyword }: EventListProps) => {
       </View>
       <TouchableOpacity onPress={() => toggleLike(item.id)}>
         <Ionicons
-          name={item.liked ? 'heart' : 'heart-outline'}
-          size={24}
-          color={item.liked ? 'red' : 'gray'}
+          name={item.liked ? 'heart' : 'heart'}
+          size={28}
+          color={item.liked ? '#4E4AFD' : 'white'}
         />
       </TouchableOpacity>
     </View>
@@ -183,7 +184,6 @@ const App = () => {
       {/* list of events */}
       <EventList keyword={query}/>
 
-      {/* bottom bar */}
     </SafeAreaView>
   );
 };
@@ -193,7 +193,7 @@ export default App;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
@@ -214,8 +214,8 @@ const styles = StyleSheet.create({
   },
   eventCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    padding: 15,
+    backgroundColor: '#EDE9FF',
+    padding: 8,
     borderRadius: 10,
     marginBottom: 15,
   },
@@ -224,30 +224,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   eventName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   eventDate: {
-    fontSize: 14,
-    color: '#555555',
-    marginTop: 5,
+    fontSize: 15,
+    color: '#000000',
+    marginTop: 3,
   },
   eventTime: {
     fontSize: 14,
     color: '#555555',
-    marginTop: 5,
+    marginTop: 3,
   },
   eventTags: {
     fontSize: 12,
     color: '#999999',
-    marginTop: 5,
+    marginTop: 3,
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderTopColor: '#CCCCCC',
-    borderTopWidth: 1,
-  },
+  eventImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    backgroundColor: "#C5B9FF",
+    alignSelf: 'center',
+  }
 });

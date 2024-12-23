@@ -12,8 +12,12 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconSelected,
+        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
         headerShown: false,
+        tabBarStyle: {
+          backgroundColor: Colors[colorScheme ?? 'light'].background,
+        },
       }}>
         <Tabs.Screen
         name="events"
@@ -60,15 +64,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* <Tabs.Screen
-        name="login"
-        options={{
-          title: 'Login',
-          tabBarIcon: ({ color, focused }) => (
-            <FontAwesome name={'key'} size = {24} color={color} />
-          ),
-        }}
-      /> */}
     </Tabs>
   );
 }
