@@ -12,15 +12,20 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconSelected,
+        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
         headerShown: false,
+        tabBarStyle: {
+          backgroundColor: Colors[colorScheme ?? 'light'].background,
+        },
+        tabBarLabelStyle: { display: 'none' }
       }}>
         <Tabs.Screen
-        name="index"
+        name="events"
         options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+            <TabBarIcon name={'home'} color={color} />
           ),
         }}
       />
@@ -42,7 +47,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* <Tabs.Screen
+      <Tabs.Screen
         name="friends"
         options={{
           title: 'Friends',
@@ -50,22 +55,13 @@ export default function TabLayout() {
             <FontAwesome name={'users'} size = {24} color={color} />
           ),
         }}
-      /> */}
-      {/* <Tabs.Screen
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
             <FontAwesome name={'user'} size = {24} color={color} />
-          ),
-        }}
-      /> */}
-      <Tabs.Screen
-        name="login"
-        options={{
-          title: 'Login',
-          tabBarIcon: ({ color, focused }) => (
-            <FontAwesome name={'key'} size = {24} color={color} />
           ),
         }}
       />

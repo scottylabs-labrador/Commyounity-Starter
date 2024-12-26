@@ -12,7 +12,7 @@ class EventSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'password'] # mapped to these fields
+        fields = ['password', 'email', 'username'] # mapped to these fields
     
     def create(self, data): # automatically called when serializer.save()
         data['password'] = make_password(data['password']) # hash pw for secrutiy

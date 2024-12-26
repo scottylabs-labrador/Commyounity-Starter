@@ -1,14 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons'; 
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../AuthContext';
-import {useSegments} from 'expo-router'
-
-// const events = [
-//   { id: '1', name: 'Charli xcx Concert', date: 'Oct 28, 2024', time: '7:00 PM', tags: 'concert • music' },
-//   { id: '4', name: 'Thanksgiving Parade', date: 'Nov 28, 2024', time: '12:00 PM', tags: 'seasonal • parade' },
-// ];
+import {useSegments} from 'expo-router';
+import SmileyFaceSmall from '@/components/SmileyFaceSmall';
 
 interface Event {
   id: string;
@@ -16,13 +12,14 @@ interface Event {
   date: string;
   time: string;
   tags: string;
+  liked: boolean;
 }
 
 const EventList = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false); 
-  const { username } = useAuth(); 
+  const { account } = useAuth(); 
   const [ended, setEnded] = useState(false); 
   const flatListRef = useRef<FlatList>(null);
   const segments = useSegments()
@@ -31,7 +28,7 @@ const EventList = () => {
     if (loading) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/get-likes/?username=${username}&page=${pageNum}`); // Replace with your API endpoint
+      const response = await fetch(`http://127.0.0.1:8000/api/get-likes/?username=${account}&page=${pageNum}`); // Replace with your API endpoint
       const data = await response.json();
       const transformedEvents = data.map((item: any) => ({
         id: item.id.toString(),
@@ -39,6 +36,7 @@ const EventList = () => {
         date: `${item.month} ${item.day}, ${item.year || ''}`, // Format date using month and day
         time: item.time,
         tags: item.category.toLowerCase(),
+        liked: true
       }));
       setEvents((prevEvents) => [...prevEvents, ...transformedEvents]); // Update state with fetched events
     } catch (error) {
@@ -68,15 +66,60 @@ const EventList = () => {
       setPage((prevPage) => prevPage + 1);
     }
   };
+
+  const toggleLike = async (eventId: string) => {
+    setEvents((prevEvents) =>
+      prevEvents.map((event) =>
+        event.id === eventId ? { ...event, liked: !event.liked } : event
+      )
+    );
+    
+    const eventToUpdate = events.find((event) => event.id === eventId);
+    if (!eventToUpdate) return;
+  
+    const action = eventToUpdate.liked ? "remove" : "add"; // Determine the action based on the current state
+  
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/add-likes/?username=${account}&event=${eventId}&action=${action}`
+      );
+  
+      if (!response.ok) {
+        console.error("Failed to update like status on the server");
+        // Revert the change in case of an error
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === eventId ? { ...event, liked: !event.liked } : event
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error while updating like status:", error);
+      // Revert the change in case of an error
+      setEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event.id === eventId ? { ...event, liked: !event.liked } : event
+        )
+      );
+    }
+  };
   
   const renderItem = ({ item }: any) => (
     <View style={styles.eventCard}>
+      <View style={styles.eventImage}></View>
       <View style={styles.eventTextContainer}>
         <Text style={styles.eventName}>{item.name}</Text>
         <Text style={styles.eventDate}>{item.date}</Text>
         <Text style={styles.eventTime}>{item.time}</Text>
         <Text style={styles.eventTags}>{item.tags}</Text>
       </View>
+      <TouchableOpacity onPress={() => toggleLike(item.id)}>
+        <Ionicons
+          name={item.liked ? 'heart' : 'heart-outline'}
+          size={28}
+          color={item.liked ? '#4E4AFD' : 'white'}
+        />
+      </TouchableOpacity>
     </View>
   );
 
@@ -96,7 +139,12 @@ const EventList = () => {
 const App = () => {
   return (
     <SafeAreaView style={styles.container}>
-      {/* logo and search bar */}
+      <View style={styles.icon}>
+        <SmileyFaceSmall/>
+        <Text style={styles.title}>
+          Comm-<Text style={styles.highlight}>YOU</Text>-nity
+        </Text>
+      </View>
       <View style={styles.header}>
         <TextInput
           style={styles.searchBar}
@@ -118,16 +166,28 @@ export default App;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF',
+  },
+  icon: {
+    margin: 10,
+    flexDirection: 'row'
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#000',
+    marginTop: 20,
+    marginLeft: 40
+  },
+  highlight: {
+    color: '#4E4AFD',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   searchBar: {
-    flex: 1,
+    width: '75%',
     backgroundColor: '#EFEFEF',
     paddingVertical: 10,
     paddingHorizontal: 15,
@@ -139,8 +199,8 @@ const styles = StyleSheet.create({
   },
   eventCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    padding: 15,
+    backgroundColor: '#EDE9FF',
+    padding: 8,
     borderRadius: 10,
     marginBottom: 15,
   },
@@ -149,30 +209,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   eventName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   eventDate: {
-    fontSize: 14,
-    color: '#555555',
-    marginTop: 5,
+    fontSize: 15,
+    color: '#000000',
+    marginTop: 3,
   },
   eventTime: {
     fontSize: 14,
     color: '#555555',
-    marginTop: 5,
+    marginTop: 3,
   },
   eventTags: {
     fontSize: 12,
     color: '#999999',
-    marginTop: 5,
+    marginTop: 3,
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderTopColor: '#CCCCCC',
-    borderTopWidth: 1,
-  },
+  eventImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    backgroundColor: "#C5B9FF",
+    alignSelf: 'center',
+  }
 });
