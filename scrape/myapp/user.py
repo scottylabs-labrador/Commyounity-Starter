@@ -73,8 +73,8 @@ def get_profile(request):
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
     
-@api_view(['POST']) 
-def update_profile(request):
+# @api_view(['POST']) 
+# def update_profile(request):
 
 
 # http://127.0.0.1:8000/api/update-preference/?username=bbb&preference={%22TRAVEL%22,%22ATHLETIC%22}
