@@ -1,24 +1,38 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, ScrollView, Linking } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ImageBackground, ScrollView, Linking } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from "expo-router";
 
 const DetailScreen = () => {
+  const navigation = useNavigation();
+
+  const handleCalendar = async () => {
+    navigation.navigate("calendar");
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header Section */}
       <ImageBackground
         style={styles.header}
       >
-        <View style={styles.headerIcons}>
-          <Text style={styles.calendarIcon}>📅</Text>
-          <Text style={styles.heartIcon}>❤️</Text>
+        <Text style={styles.eventTitle}>Event Title</Text>
+        <View style={styles.iconGroup}>
+          <TouchableOpacity onPress={handleCalendar}>
+            <Image
+              source={require("../assets/images/calendar.png")}
+              style={styles.calendarIcon}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Ionicons
+              name={'heart-outline'}
+              size={32}
+              color={'white'}
+            />
+          </TouchableOpacity>
         </View>
-        <View style={styles.eventDetails}>
-            <Text style={styles.eventTitle}>Event Title</Text>
-        </View>
-      </ImageBackground>
-
-      {/* Event Title */}
-      
+      </ImageBackground>   
 
       {/* Description */}
       <View style={styles.descriptionSection}>
@@ -60,31 +74,27 @@ const DetailScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: "#FFFFFF"
   },
   header: {
     height: 220,
     overflow: "hidden",
     justifyContent: "space-between",
-    backgroundColor: "#C5B9FF"
-  },
-  headerIcons: {
+    alignItems: "flex-end",
+    backgroundColor: "#C5B9FF",
     flexDirection: "row",
-    justifyContent: "flex-end",
-    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 5
+  },
+  iconGroup: {
+    flexDirection: "row"
   },
   calendarIcon: {
-    fontSize: 24,
-  },
-  heartIcon: {
-    fontSize: 24,
-    marginLeft: 16,
-  },
-  eventDetails: {
-    marginTop: 16,
-    marginHorizontal: 16,
-    marginBottom: 5,
-    alignItems: "flex-start",
+    width: 25,
+    height: 27,
+    marginRight: 10,
+    marginTop: 3
   },
   eventTitle: {
     fontSize: 26,
