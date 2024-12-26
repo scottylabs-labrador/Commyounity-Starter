@@ -16,7 +16,8 @@ class Events(models.Model):
 
 class User(models.Model):
     username = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    nickname = models.CharField(max_length=100, default='User')
+    nickname = models.CharField(max_length=100, default='New User')
+    bio = models.CharField(max_length=500, default='Biography: Hi! I\'m new to Comm-you-nity, plz hmu if yall are interested in going out together! insta: @')
     password = models.CharField(max_length=100)
     email = models.CharField(max_length=100, unique=True, default='default@example.com')
     verified = models.BooleanField(default=False)

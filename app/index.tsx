@@ -55,7 +55,7 @@ const LoginView: React.FC = () => {
       <SmileyFace/>
 
       <View style={styles.form}>
-        <Text style={styles.label}>email</Text>
+        <Text style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
           placeholder="email"
@@ -82,7 +82,7 @@ const LoginView: React.FC = () => {
       <TouchableOpacity
         style={styles.link}
         onPress={handleSignup}>
-        <Text>Sign up</Text>
+        <Text style={styles.linktext}>Sign up</Text>
       </TouchableOpacity>
     </View>
   );
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   highlight: {
-    color: '#7D4DFF',
+    color: '#4E4AFD',
   },
   emojiContainer: {
     backgroundColor: '#FFFFCC',
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '100%',
-    marginBottom: 20,
+    marginBottom: 20
   },
   label: {
     fontSize: 14,
@@ -139,15 +139,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#E0D8F9',
+    backgroundColor: '#C5B9FF',
     borderRadius: 8,
-    width: '100%',
+    width: '30%',
     alignItems: 'center',
-    paddingVertical: 15,
-    marginBottom: 10,
+    paddingVertical: 10
   },
   buttonText: {
-    color: '#7D4DFF',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -156,6 +155,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 10,
   },
+  linktext: {
+    color: '#C5B9FF',
+    textDecorationLine: "underline"
+  }
 });
 
 export default LoginView;

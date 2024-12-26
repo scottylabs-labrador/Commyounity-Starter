@@ -4,6 +4,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useSegments } from 'expo-router'
 import SmileyFaceSmall from '@/components/SmileyFaceSmall';
 
 interface Event {
@@ -26,6 +27,7 @@ const EventList = ({ keyword }: EventListProps) => {
   const [ended, setEnded] = useState(false); 
   const { account } = useAuth(); 
   const flatListRef = useRef<FlatList>(null);
+  const segments = useSegments()
 
   const fetchEvents = async (pageNum: number) => {
     if (loading) return;
@@ -48,28 +50,22 @@ const EventList = ({ keyword }: EventListProps) => {
         liked: false,
       }));
 
-      const updatedEvents = await Promise.all(
-        transformedEvents.map(async (event) => {
-          try {
-            const response = await fetch(
-              `http://127.0.0.1:8000/api/check-likes/?username=${account}&event=${event.id}`
-            );
-            const result = await response.json();
-      
-            return {
-              ...event,
-              liked: result.liked === true,
-            };
-          } catch (error) {
-            console.error(`Error fetching liked status for event ${event.id}:`, error);
-            return event; // Return the original event if the API call fails
-          }
-        })
-      );
+      if(account){
+        const response_ = await fetch(`http://127.0.0.1:8000/api/get-likes-id/?username=${account}`);
+        const data_ = await response_.json();
+        const likes = data_.likes;
+  
+        const updatedEvents = transformedEvents.map((event) => {
+          return {
+            ...event,  // Keep all existing properties
+            liked: likes.includes(parseInt(event.id)) // Set liked to true if event id is in the likes array
+          };
+        });
 
-      console.log(updatedEvents);
-      
-      setEvents((prevEvents) => [...prevEvents, ...updatedEvents]); // Update state with fetched events
+        setEvents((prevEvents) => [...prevEvents, ...updatedEvents]);
+      } else {
+        setEvents((prevEvents) => [...prevEvents, ...transformedEvents]);
+      }
     } catch (error) {
       console.error('Error fetching events:', error);
       setEnded(true);
@@ -95,6 +91,15 @@ const EventList = ({ keyword }: EventListProps) => {
       flatListRef.current.scrollToOffset({ animated: true, offset: 0 }); // Scroll to top when keyword changes
     }
   }, [account]);
+
+    useEffect(() => {
+      setEvents([]);
+      setPage(0);
+      setEnded(false);
+      if (flatListRef.current) {
+        flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
+      }
+     }, [segments])
 
   useEffect(() => {
     if(page === 0) setPage(1);
@@ -155,7 +160,7 @@ const EventList = ({ keyword }: EventListProps) => {
       </View>
       <TouchableOpacity onPress={() => toggleLike(item.id)}>
         <Ionicons
-          name={item.liked ? 'heart' : 'heart'}
+          name={item.liked ? 'heart' : 'heart-outline'}
           size={28}
           color={item.liked ? '#4E4AFD' : 'white'}
         />
@@ -194,6 +199,9 @@ const App = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.icon}>
         <SmileyFaceSmall/>
+        <Text style={styles.title}>
+          Comm-<Text style={styles.highlight}>YOU</Text>-nity
+        </Text>
       </View>
       <View style={styles.header}>
         <TextInput
@@ -223,6 +231,16 @@ const styles = StyleSheet.create({
   icon: {
     margin: 10,
     flexDirection: 'row'
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#000',
+    marginTop: 20,
+    marginLeft: 40
+  },
+  highlight: {
+    color: '#4E4AFD',
   },
   header: {
     flexDirection: 'column',

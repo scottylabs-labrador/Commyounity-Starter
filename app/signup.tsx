@@ -4,6 +4,7 @@ import { useAuth } from './AuthContext';
 import { useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import { send, EmailJSResponseStatus } from '@emailjs/react-native';
+import SmileyFaceMedium from '@/components/SmileyFaceMedium';
 
 export default function SignUpScreen() {
     const [email, setEmail] = useState<string | undefined>(undefined);
@@ -85,6 +86,7 @@ export default function SignUpScreen() {
       <Text style={styles.title}>
         Comm-<Text style={styles.highlight}>YOU</Text>-nity
       </Text>
+      <SmileyFaceMedium/>
 
       {/* Form Section */}
       <View style={styles.form}>
@@ -133,7 +135,7 @@ export default function SignUpScreen() {
       <TouchableOpacity
         style={styles.link}
         onPress={handleLogin}>
-        <Text>Log in</Text>
+        <Text style={styles.linktext}>Log in</Text>
       </TouchableOpacity>
     </View>
   );
@@ -151,10 +153,10 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   highlight: {
-    color: '#7D4DFF',
+    color: '#4E4AFD',
   },
   emojiContainer: {
     backgroundColor: '#FFFFCC',
@@ -163,19 +165,19 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   emoji: {
     fontSize: 40,
   },
   form: {
     width: '100%',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    marginBottom: 5,
+    marginBottom: 3,
     color: '#000',
   },
   input: {
@@ -185,20 +187,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#DDD',
-    marginBottom: 15,
+    marginBottom: 10,
     color: '#000',
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#E0D8F9',
+    backgroundColor: '#C5B9FF',
     borderRadius: 8,
-    width: '100%',
+    width: '30%',
     alignItems: 'center',
-    paddingVertical: 15,
-    marginBottom: 10,
+    paddingVertical: 10
   },
   buttonText: {
-    color: '#7D4DFF',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -207,4 +208,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 10,
   },
+  linktext: {
+    color: '#C5B9FF',
+    textDecorationLine: "underline"
+  }
 });

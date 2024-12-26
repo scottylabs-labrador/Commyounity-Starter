@@ -55,6 +55,40 @@ def verify_email(request):
     user.save()
     return JsonResponse({'message': 'Email verified successfully!'})
 
+# http://127.0.0.1:8000/api/get-nickname?username=user
+@api_view(['GET'])
+def get_nickname(request):
+    account = request.query_params.get('account', None);
+    if not account:
+        return Response({"error": "Username is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(username=account)
+
+        return Response({
+            "message": "User events updated successfully",
+            "likes": user.nickname
+            }, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+# http://127.0.0.1:8000/api/get-bio?username=user
+@api_view(['GET'])
+def get_bio(request):
+    account = request.query_params.get('account', None);
+    if not account:
+        return Response({"error": "Username is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(username=account)
+
+        return Response({
+            "message": "User events updated successfully",
+            "likes": user.bio
+            }, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
 # http://127.0.0.1:8000/api/update-preference/?username=bbb&preference={%22TRAVEL%22,%22ATHLETIC%22}
 @api_view(['GET'])
 def update_user_preference(request):
@@ -91,23 +125,19 @@ def update_user_events(request):
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-# http://127.0.0.1:8000/api/check-likes/?username=bbb&event=10
+# http://127.0.0.1:8000/api/get-likes-id/?username=bbb
 @api_view(['GET'])
-def check_user_like(request):
+def get_user_like_id(request):
     username = request.query_params.get('username', None);
-    event = request.query_params.get('event', None);
     if not username:
         return Response({"error": "Username is required."}, status=status.HTTP_400_BAD_REQUEST)
-    if not event:
-        return Response({"error": "Event ID is required."}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
         user = User.objects.get(username=username)
-        liked = int(event) in user.events
 
         return Response({
             "message": "User events updated successfully",
-            "liked": liked
+            "likes": user.events
             }, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -131,11 +161,11 @@ def add_user_event(request):
     try:
         user = User.objects.get(username=username)
         if action == "add":
-            if event not in user.events:
-                user.events.append(event)
+            if int(event) not in user.events:
+                user.events.append(int(event))
         elif action == "remove":
-            if event in user.events:
-                user.events.remove(event)
+            if int(event) in user.events:
+                user.events.remove(int(event))
         else:
             return Response({"error": "Action invalid."}, status=status.HTTP_400_BAD_REQUEST)
         user.save()

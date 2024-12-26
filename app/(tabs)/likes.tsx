@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../AuthContext';
-import {useSegments} from 'expo-router'
+import {useSegments} from 'expo-router';
 import SmileyFaceSmall from '@/components/SmileyFaceSmall';
 
 interface Event {
@@ -66,6 +66,43 @@ const EventList = () => {
       setPage((prevPage) => prevPage + 1);
     }
   };
+
+  const toggleLike = async (eventId: string) => {
+    setEvents((prevEvents) =>
+      prevEvents.map((event) =>
+        event.id === eventId ? { ...event, liked: !event.liked } : event
+      )
+    );
+    
+    const eventToUpdate = events.find((event) => event.id === eventId);
+    if (!eventToUpdate) return;
+  
+    const action = eventToUpdate.liked ? "remove" : "add"; // Determine the action based on the current state
+  
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/add-likes/?username=${account}&event=${eventId}&action=${action}`
+      );
+  
+      if (!response.ok) {
+        console.error("Failed to update like status on the server");
+        // Revert the change in case of an error
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === eventId ? { ...event, liked: !event.liked } : event
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error while updating like status:", error);
+      // Revert the change in case of an error
+      setEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event.id === eventId ? { ...event, liked: !event.liked } : event
+        )
+      );
+    }
+  };
   
   const renderItem = ({ item }: any) => (
     <View style={styles.eventCard}>
@@ -76,9 +113,9 @@ const EventList = () => {
         <Text style={styles.eventTime}>{item.time}</Text>
         <Text style={styles.eventTags}>{item.tags}</Text>
       </View>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => toggleLike(item.id)}>
         <Ionicons
-          name={item.liked ? 'heart' : 'heart'}
+          name={item.liked ? 'heart' : 'heart-outline'}
           size={28}
           color={item.liked ? '#4E4AFD' : 'white'}
         />
@@ -104,6 +141,9 @@ const App = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.icon}>
         <SmileyFaceSmall/>
+        <Text style={styles.title}>
+          Comm-<Text style={styles.highlight}>YOU</Text>-nity
+        </Text>
       </View>
       <View style={styles.header}>
         <TextInput
@@ -131,6 +171,16 @@ const styles = StyleSheet.create({
   icon: {
     margin: 10,
     flexDirection: 'row'
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#000',
+    marginTop: 20,
+    marginLeft: 40
+  },
+  highlight: {
+    color: '#4E4AFD',
   },
   header: {
     flexDirection: 'column',

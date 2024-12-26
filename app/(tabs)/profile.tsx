@@ -1,28 +1,73 @@
-import React from "react";
+import React , { useState } from "react";
 import SmileyFace from "@/components/SmileyFace";
-import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet , TextInput} from "react-native";
+import { useNavigation } from "expo-router";
+import { useAuth } from "../AuthContext";
 
 const ProfileScreen = () => {
+  const navigation = useNavigation();
+  const { account, setAccount } = useAuth();
+
+  // State for username and biography
+  const [username, setUsername] = useState("@Unlogged In User");
+  const [biography, setBiography] = useState(
+    "Hi! Feel free to log in or register to access all features of Comm-you-nity :)"
+  );
+  const [isEditing, setIsEditing] = useState(false);
+
+  const logout = async () => {
+    setAccount("");
+    navigation.navigate("index");
+  };
+
+  const toggleEditing = () => {
+    setIsEditing(!isEditing);
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Profile Header */}
       <View style={styles.profileHeader}>
         <View style={styles.profilePicture}>
-          <SmileyFace/>
+          <SmileyFace />
         </View>
-        <Text style={styles.username}>@Username</Text>
-        <Text style={styles.bio}>
-          Biography: Hi my name is and I am currently a student at plz hmu if yall are interested
-          in going to together! insta: @
-        </Text>
+
+        {isEditing ? (
+          <TextInput
+            style={styles.editableUsername}
+            value={username}
+            onChangeText={setUsername}
+          />
+        ) : (
+          <Text style={styles.username}>{username}</Text>
+        )}
+
+        {isEditing ? (
+          <TextInput
+            style={styles.editableBio}
+            value={biography}
+            onChangeText={setBiography}
+            multiline
+          />
+        ) : (
+          <Text style={styles.bio}>{biography}</Text>
+        )}
       </View>
 
       {/* Buttons */}
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={[styles.button, styles.shareButton]}>
-          <Text style={styles.buttonText}>Edit Profile</Text>
+        <TouchableOpacity
+          style={[styles.button, styles.shareButton]}
+          onPress={toggleEditing}
+        >
+          <Text style={styles.buttonText}>
+            {isEditing ? "Save Changes" : "Edit Profile"}
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.editButton]}>
+        <TouchableOpacity
+          style={[styles.button, styles.editButton]}
+          onPress={logout}
+        >
           <Text style={styles.buttonText}>Log Out</Text>
         </TouchableOpacity>
       </View>
@@ -54,7 +99,6 @@ const ProfileScreen = () => {
           </View>
         </ScrollView>
       </View>
-
     </ScrollView>
   );
 };
@@ -86,6 +130,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#555",
     textAlign: "center"
+  },
+  editableUsername: { 
+    fontSize: 18, 
+    fontWeight: "bold", 
+    marginBottom: 8, 
+    borderBottomWidth: 1 
+  },
+  editableBio: { 
+    width: "90%",
+    fontSize: 14, 
+    color: "#555",
+    textAlign: "center", 
+    borderWidth: 1, 
+    padding: 15, 
+    borderRadius: 5 
   },
   buttonsContainer: {
     flexDirection: "row",
@@ -135,7 +194,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#555",
-  },
+  }
 });
 
 export default ProfileScreen;
