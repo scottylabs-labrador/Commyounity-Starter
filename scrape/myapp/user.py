@@ -55,9 +55,9 @@ def verify_email(request):
     user.save()
     return JsonResponse({'message': 'Email verified successfully!'})
 
-# http://127.0.0.1:8000/api/get-nickname?username=user
+# http://127.0.0.1:8000/api/get-profile?username=user
 @api_view(['GET'])
-def get_nickname(request):
+def get_profile(request):
     account = request.query_params.get('account', None);
     if not account:
         return Response({"error": "Username is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -67,27 +67,15 @@ def get_nickname(request):
 
         return Response({
             "message": "User events updated successfully",
-            "likes": user.nickname
+            "nickname": user.nickname,
+            "bio": user.bio
             }, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
     
-# http://127.0.0.1:8000/api/get-bio?username=user
-@api_view(['GET'])
-def get_bio(request):
-    account = request.query_params.get('account', None);
-    if not account:
-        return Response({"error": "Username is required."}, status=status.HTTP_400_BAD_REQUEST)
-    
-    try:
-        user = User.objects.get(username=account)
+@api_view(['POST']) 
+def update_profile(request):
 
-        return Response({
-            "message": "User events updated successfully",
-            "likes": user.bio
-            }, status=status.HTTP_200_OK)
-    except User.DoesNotExist:
-        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
 # http://127.0.0.1:8000/api/update-preference/?username=bbb&preference={%22TRAVEL%22,%22ATHLETIC%22}
 @api_view(['GET'])

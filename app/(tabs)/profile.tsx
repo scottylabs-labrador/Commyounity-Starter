@@ -1,12 +1,14 @@
-import React , { useState } from "react";
+import React , { useState , useEffect} from "react";
 import SmileyFace from "@/components/SmileyFace";
 import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet , TextInput} from "react-native";
 import { useNavigation } from "expo-router";
 import { useAuth } from "../AuthContext";
+import { useSegments } from 'expo-router';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const { account, setAccount } = useAuth();
+  const segments = useSegments();
 
   // State for username and biography
   const [username, setUsername] = useState("@Unlogged In User");
@@ -23,6 +25,24 @@ const ProfileScreen = () => {
   const toggleEditing = () => {
     setIsEditing(!isEditing);
   };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch( `http://127.0.0.1:8000/api/get-profile?account=${account}`)
+        const data = await response.json();
+
+        setUsername("@" + data.nickname);
+        setBiography(data.bio);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    if (account) {
+      fetchProfile();
+    }
+  }, [segments]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

@@ -4,7 +4,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../AuthContext';
 import { Ionicons } from '@expo/vector-icons';
-import { useSegments } from 'expo-router'
+import { useSegments } from 'expo-router';
 import SmileyFaceSmall from '@/components/SmileyFaceSmall';
 
 interface Event {
