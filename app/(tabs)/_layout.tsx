@@ -18,6 +18,7 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: Colors[colorScheme ?? 'light'].background,
         },
+        tabBarLabelStyle: { display: 'none' }
       }}>
         <Tabs.Screen
         name="events"

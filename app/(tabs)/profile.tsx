@@ -20,10 +20,10 @@ const ProfileScreen = () => {
       {/* Buttons */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={[styles.button, styles.shareButton]}>
-          <Text style={styles.buttonText}>Share Profile</Text>
+          <Text style={styles.buttonText}>Edit Profile</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button, styles.editButton]}>
-          <Text style={styles.buttonText}>Edit Profile</Text>
+          <Text style={styles.buttonText}>Log Out</Text>
         </TouchableOpacity>
       </View>
 

@@ -3,7 +3,7 @@ import {
   StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert,
 } from 'react-native';
 import { useAuth } from './AuthContext';
-import { useRouter } from 'expo-router';
+import { useRouter, useNavigation } from 'expo-router';
 import SmileyFace from '@/components/SmileyFace';
 
 const LoginView: React.FC = () => {

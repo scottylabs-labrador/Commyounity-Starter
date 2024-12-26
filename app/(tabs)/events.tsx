@@ -4,6 +4,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import SmileyFaceSmall from '@/components/SmileyFaceSmall';
 
 interface Event {
   id: string;
@@ -38,15 +39,37 @@ const EventList = ({ keyword }: EventListProps) => {
 
       const response = await fetch(url);
       const data = await response.json();
-      const transformedEvents = data.map((item: any) => ({
+      const transformedEvents: Event[] = data.map((item: any): Event => ({
         id: item.id.toString(),
         name: item.title,
-        date: `${item.month} ${item.day}, ${item.year || ''}`, // Format date using month and day
+        date: `${item.month} ${item.day}, ${item.year || ''}`, // Format date
         time: item.time,
         tags: item.category.toLowerCase(),
         liked: false,
       }));
-      setEvents((prevEvents) => [...prevEvents, ...transformedEvents]); // Update state with fetched events
+
+      const updatedEvents = await Promise.all(
+        transformedEvents.map(async (event) => {
+          try {
+            const response = await fetch(
+              `http://127.0.0.1:8000/api/check-likes/?username=${account}&event=${event.id}`
+            );
+            const result = await response.json();
+      
+            return {
+              ...event,
+              liked: result.liked === true,
+            };
+          } catch (error) {
+            console.error(`Error fetching liked status for event ${event.id}:`, error);
+            return event; // Return the original event if the API call fails
+          }
+        })
+      );
+
+      console.log(updatedEvents);
+      
+      setEvents((prevEvents) => [...prevEvents, ...updatedEvents]); // Update state with fetched events
     } catch (error) {
       console.error('Error fetching events:', error);
       setEnded(true);
@@ -169,16 +192,18 @@ const App = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* logo and search bar */}
+      <View style={styles.icon}>
+        <SmileyFaceSmall/>
+      </View>
       <View style={styles.header}>
-      <TextInput
-          style={styles.searchBar}
-          placeholder="Search"
-          placeholderTextColor="#999"
-          onChangeText={handleInputChange}
-          onSubmitEditing={handleEnterKey}
-          value={keyword}
-        />
+        <TextInput
+            style={styles.searchBar}
+            placeholder="Search"
+            placeholderTextColor="#999"
+            onChangeText={handleInputChange}
+            onSubmitEditing={handleEnterKey}
+            value={keyword}
+          ></TextInput>
       </View>
 
       {/* list of events */}
@@ -195,14 +220,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
+  icon: {
+    margin: 10,
+    flexDirection: 'row'
+  },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   searchBar: {
-    flex: 1,
+    width: '75%',
     backgroundColor: '#EFEFEF',
     paddingVertical: 10,
     paddingHorizontal: 15,

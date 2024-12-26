@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+__pycache__/
+
+# Database
+db.sqlite3
+
+# Django settings with sensitive info
+.env
+.env.*
+
+# Logs
+*.log
+
+# Media uploads (optional if managed externally)
+media/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Static files (optional if managed externally)
+static/

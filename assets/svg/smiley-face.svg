@@ -1,0 +1,9 @@
+<svg width="215" height="215" viewBox="0 0 215 215" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Component 1">
+<circle id="Ellipse 1" cx="107.5" cy="107.5" r="107.5" fill="#E5FF98"/>
+<ellipse id="Ellipse 2" cx="71" cy="86.5" rx="9" ry="20.5" fill="black"/>
+<ellipse id="Ellipse 3" cx="145" cy="86.5" rx="9" ry="20.5" fill="black"/>
+<path id="Rectangle 1" d="M85 125.5C85 122.462 87.4624 120 90.5 120H124.5C127.538 120 130 122.462 130 125.5V130.5C130 142.926 119.926 153 107.5 153C95.0736 153 85 142.926 85 130.5V125.5Z" fill="#FE01E6"/>
+<ellipse id="Ellipse 24" cx="108" cy="145" rx="14" ry="8" fill="#FFC7C1"/>
+</g>
+</svg>
