@@ -46,7 +46,7 @@ const EventList = ({ keyword }: EventListProps) => {
       const transformedEvents: Event[] = data.map((item: any): Event => ({
         id: item.id.toString(),
         name: item.title,
-        date: `${item.month} ${item.day}, ${item.year || ''}`, // Format date
+        date: `${item.month} ${item.day} ${item.year || ''}`, // Format date
         time: item.time,
         tags: item.category.toLowerCase(),
         liked: false,

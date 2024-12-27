@@ -68,14 +68,43 @@ def get_profile(request):
         return Response({
             "message": "User events updated successfully",
             "nickname": user.nickname,
-            "bio": user.bio
+            "bio": user.bio,
+            "interests": user.preference
             }, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
     
-# @api_view(['POST']) 
-# def update_profile(request):
+@api_view(['POST']) 
+def update_profile(request):
+    try:
+        nickname = request.data.get('username')
+        bio = request.data.get('biography')
+        account = request.data.get('account')
 
+        if not nickname and not bio:
+            return Response(
+                {"error": "At least one of 'nickname' or 'bio' must be provided."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Get the user object
+        user = get_object_or_404(User, username=account)
+
+        # Update the fields if provided
+        if nickname:
+            user.nickname = nickname
+        if bio:
+            user.bio = bio
+        user.save()
+
+        # Return the updated user info
+        return Response(
+            {"message": "Profile updated successfully.", "nickname": user.nickname, "bio": user.bio},
+            status=status.HTTP_200_OK
+        )
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # http://127.0.0.1:8000/api/update-preference/?username=bbb&preference={%22TRAVEL%22,%22ATHLETIC%22}
 @api_view(['GET'])
