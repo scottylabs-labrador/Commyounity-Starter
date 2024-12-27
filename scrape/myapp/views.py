@@ -67,6 +67,12 @@ class UserLikes(APIView):
         events = Events.objects.all()
         matching_events = [event for event in events if event.id in event_id]
 
+        page = request.query_params.get('page', None)
+        serializer = EventSerializer(matching_events, many=True)
+
+        if(page == None):
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         paginator = self.pagination_class()
         paginated_events = paginator.paginate_queryset(matching_events, request)
         serializer = EventSerializer(paginated_events, many=True)
