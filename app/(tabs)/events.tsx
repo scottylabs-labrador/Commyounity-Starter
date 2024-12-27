@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'r
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../AuthContext';
+import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSegments } from 'expo-router';
 import SmileyFaceSmall from '@/components/SmileyFaceSmall';
@@ -27,6 +28,7 @@ const EventList = ({ keyword }: EventListProps) => {
   const [ended, setEnded] = useState(false); 
   const { account } = useAuth(); 
   const flatListRef = useRef<FlatList>(null);
+  const naviation = useNavigation();
   const segments = useSegments()
 
   const fetchEvents = async (pageNum: number) => {
@@ -44,7 +46,7 @@ const EventList = ({ keyword }: EventListProps) => {
       const transformedEvents: Event[] = data.map((item: any): Event => ({
         id: item.id.toString(),
         name: item.title,
-        date: `${item.month} ${item.day}, ${item.year || ''}`, // Format date
+        date: `${item.month} ${item.day} ${item.year || ''}`, // Format date
         time: item.time,
         tags: item.category.toLowerCase(),
         liked: false,
@@ -148,24 +150,30 @@ const EventList = ({ keyword }: EventListProps) => {
       );
     }
   };
+
+  const handleEventCard = () => {
+    naviation.navigate("detail");
+  };
   
   const renderItem = ({ item }: any) => (
-    <View style={styles.eventCard}>
-      <View style={styles.eventImage}></View>
-      <View style={styles.eventTextContainer}>
-        <Text style={styles.eventName}>{item.name}</Text>
-        <Text style={styles.eventDate}>{item.date}</Text>
-        <Text style={styles.eventTime}>{item.time}</Text>
-        <Text style={styles.eventTags}>{item.tags}</Text>
+    <TouchableOpacity onPress={handleEventCard}>
+      <View style={styles.eventCard}>
+        <View style={styles.eventImage}></View>
+        <View style={styles.eventTextContainer}>
+          <Text style={styles.eventName}>{item.name}</Text>
+          <Text style={styles.eventDate}>{item.date}</Text>
+          <Text style={styles.eventTime}>{item.time}</Text>
+          <Text style={styles.eventTags}>{item.tags}</Text>
+        </View>
+        <TouchableOpacity onPress={() => toggleLike(item.id)}>
+          <Ionicons
+            name={item.liked ? 'heart' : 'heart-outline'}
+            size={28}
+            color={item.liked ? '#4E4AFD' : 'white'}
+          />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={() => toggleLike(item.id)}>
-        <Ionicons
-          name={item.liked ? 'heart' : 'heart-outline'}
-          size={28}
-          color={item.liked ? '#4E4AFD' : 'white'}
-        />
-      </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

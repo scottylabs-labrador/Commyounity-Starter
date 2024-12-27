@@ -1,6 +1,7 @@
 import React , { useState , useEffect} from "react";
 import SmileyFace from "@/components/SmileyFace";
 import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet , TextInput} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 import { useAuth } from "../AuthContext";
 import { useSegments } from 'expo-router';
@@ -11,15 +12,45 @@ const ProfileScreen = () => {
   const segments = useSegments();
 
   // State for username and biography
-  const [username, setUsername] = useState("@Unlogged In User");
+  const [username, setUsername] = useState("Unlogged In User");
   const [biography, setBiography] = useState(
     "Hi! Feel free to log in or register to access all features of Comm-you-nity :)"
   );
   const [isEditing, setIsEditing] = useState(false);
+  const [interests, setInterests] = useState<string[]>([]);
+
+  const saveProfile = async () => {
+    if(account)
+    {
+      const url = 'http://127.0.0.1:8000/api/update-profile/';
+      const payload = {
+          username,
+          biography,
+          account
+      };
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+    
+      if (response.status == 200) {
+        window.alert('Profile updated successfully.');
+      } else {
+        window.alert('Failed to update account.');
+      }
+    }
+  };
 
   const logout = async () => {
     setAccount("");
     navigation.navigate("index");
+  };
+
+  const customize = async () => {
+    navigation.navigate("customize");
   };
 
   const toggleEditing = () => {
@@ -32,8 +63,10 @@ const ProfileScreen = () => {
         const response = await fetch( `http://127.0.0.1:8000/api/get-profile?account=${account}`)
         const data = await response.json();
 
-        setUsername("@" + data.nickname);
+        setUsername(data.nickname);
         setBiography(data.bio);
+        const lowercaseList: string[] = data.interests.map(str => str.toLowerCase());
+        setInterests(lowercaseList);
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
@@ -78,7 +111,12 @@ const ProfileScreen = () => {
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           style={[styles.button, styles.shareButton]}
-          onPress={toggleEditing}
+          onPress={() => {
+            if (isEditing) {
+              saveProfile();
+            }
+            toggleEditing();
+          }}
         >
           <Text style={styles.buttonText}>
             {isEditing ? "Save Changes" : "Edit Profile"}
@@ -92,39 +130,45 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Past Events */}
       <View style={styles.sectionContainer}>
-        <Text style={styles.sectionTitle}>My past events</Text>
-        <ScrollView horizontal={true}>
-          <View style={styles.grid}>
-            <View style={styles.gridItem} />
-            <View style={styles.gridItem} />
-            <View style={styles.gridItem} />
-            <View style={styles.gridItem} />
-            <View style={styles.gridItem} />
-          </View>
-        </ScrollView>
-      </View>
+        <View>
+          <Text style={styles.sectionTitle}>My past events</Text>
+          <ScrollView horizontal={true}>
+            <View style={styles.grid}>
+              <View style={styles.gridItem} />
+              <View style={styles.gridItem} />
+              <View style={styles.gridItem} />
+              <View style={styles.gridItem} />
+              <View style={styles.gridItem} />
+            </View>
+          </ScrollView>
+        </View>
 
-      {/* Interests */}
-      <View style={styles.sectionContainer}>
-        <Text style={styles.sectionTitle}>My interests</Text>
-        <ScrollView horizontal={true}>
-          <View style={styles.grid}>
-            <View style={styles.gridItem} />
-            <View style={styles.gridItem} />
-            <View style={styles.gridItem} />
-            <View style={styles.gridItem} />
-            <View style={styles.gridItem} />
-          </View>
-        </ScrollView>
+        {/* Interests */}
+        <View>
+          <Text style={styles.sectionTitle}>My interests</Text>
+          <ScrollView horizontal={true}>
+            <View style={styles.grid}>
+              <TouchableOpacity style={styles.gridItem} onPress={customize}>
+                <Ionicons name="add-circle" size={28} color="white" />
+              </TouchableOpacity>
+              {interests.map((item, index) => (
+                <View key={index} style={styles.gridItem}>
+                  <Text style={styles.gridText}>{item}</Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
       </View>
+      {/* Past Events */}
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 20,
     alignItems: "center",
     backgroundColor: "#fff",
@@ -205,7 +249,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 10,
-    backgroundColor: "#E0D7F9",
+    backgroundColor: "#C5B9FF",
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 5,
@@ -213,7 +257,7 @@ const styles = StyleSheet.create({
   gridText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#555",
+    color: "#FFFFFF",
   }
 });
 

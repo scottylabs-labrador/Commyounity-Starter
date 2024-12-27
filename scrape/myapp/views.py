@@ -18,9 +18,7 @@ class EventList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 def rank(events, preference):
-    print(preference)
     matching_events = [event for event in events if event.category in preference]
-    print(matching_events)
     non_matching_events = [event for event in events if event.category not in preference]
     ranked_events = matching_events + non_matching_events
     return ranked_events
@@ -68,6 +66,12 @@ class UserLikes(APIView):
         
         events = Events.objects.all()
         matching_events = [event for event in events if event.id in event_id]
+
+        page = request.query_params.get('page', None)
+        serializer = EventSerializer(matching_events, many=True)
+
+        if(page == None):
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         paginator = self.pagination_class()
         paginated_events = paginator.paginate_queryset(matching_events, request)
