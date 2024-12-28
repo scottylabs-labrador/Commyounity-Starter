@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Touchable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../AuthContext';
 import {useSegments} from 'expo-router';
+import { useNavigation } from 'expo-router';
 import SmileyFaceSmall from '@/components/SmileyFaceSmall';
 
 interface Event {
@@ -21,6 +22,7 @@ const EventList = () => {
   const [loading, setLoading] = useState(false); 
   const { account } = useAuth(); 
   const [ended, setEnded] = useState(false); 
+  const navigation = useNavigation();
   const flatListRef = useRef<FlatList>(null);
   const segments = useSegments()
 
@@ -67,6 +69,10 @@ const EventList = () => {
     }
   };
 
+  const handleEventCard = () => {
+    navigation.navigate("detail");
+  };
+
   const toggleLike = async (eventId: string) => {
     setEvents((prevEvents) =>
       prevEvents.map((event) =>
@@ -105,7 +111,7 @@ const EventList = () => {
   };
   
   const renderItem = ({ item }: any) => (
-    <View style={styles.eventCard}>
+    <TouchableOpacity style={styles.eventCard} onPress={handleEventCard}>
       <View style={styles.eventImage}></View>
       <View style={styles.eventTextContainer}>
         <Text style={styles.eventName}>{item.name}</Text>
@@ -120,7 +126,7 @@ const EventList = () => {
           color={item.liked ? '#4E4AFD' : 'white'}
         />
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
