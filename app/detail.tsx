@@ -2,8 +2,11 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, ImageBackground, ScrollView, Linking } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from "expo-router";
+import { useRoute } from "@react-navigation/native";
 
 const DetailScreen = () => {
+  const router = useRoute();
+  const event = router.params.event;
   const navigation = useNavigation();
 
   const handleCalendar = async () => {
@@ -16,7 +19,7 @@ const DetailScreen = () => {
       <ImageBackground
         style={styles.header}
       >
-        <Text style={styles.eventTitle}>Event Title</Text>
+        <Text style={styles.eventTitle}>{event.name}</Text>
         <View style={styles.iconGroup}>
           <TouchableOpacity onPress={handleCalendar}>
             <Image
@@ -48,7 +51,7 @@ const DetailScreen = () => {
 
       {/* Tags */}
       <View style={styles.tagsContainer}>
-        {["tagtagtag", "tag", "tagtag", "tagtagtag", "tag"].map((tag, index) => (
+        {[event.tags].map((tag, index) => (
           <View key={index} style={styles.tag}>
             <Text style={styles.tagText}>{tag}</Text>
           </View>
