@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   gridText: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "bold",
     color: "#FFFFFF",
   }

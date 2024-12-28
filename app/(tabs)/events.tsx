@@ -151,12 +151,12 @@ const EventList = ({ keyword }: EventListProps) => {
     }
   };
 
-  const handleEventCard = () => {
-    naviation.navigate("detail");
+  const handleEventCard = (event: Event) => {
+    naviation.navigate('detail', { event });
   };
   
   const renderItem = ({ item }: any) => (
-    <TouchableOpacity onPress={handleEventCard}>
+    <TouchableOpacity onPress={() => handleEventCard(item)}>
       <View style={styles.eventCard}>
         <View style={styles.eventImage}></View>
         <View style={styles.eventTextContainer}>
