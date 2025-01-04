@@ -2,6 +2,10 @@ from selenium import webdriver
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.edge.options import Options 
 from bs4 import BeautifulSoup
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'scrape.settings')
+django.setup()
 from myapp.models import Events
 import time
 
@@ -22,7 +26,7 @@ def scrape():
     options = Options()
     options.add_argument('--lang=en-US')
     driver = webdriver.Edge(service=service, options=options)
-    driver.get('https://www.bing.com/search?q=All+Events+Events+in+Philadelphia&filters=latlong%3a%2239.9510612487793%2c-75.16561889648438%22+location%3a%22Philadelphia%22+eventcity%3a%22020d4bbf-2971-4236-b87d-c3ec1d7f851c%22+catesegtype%3a%22ZXZlbnRfY2l0eQ%3d%3d%22+eventsgroup%3a%22MTQw%22+date%3a%2220241005_20241231%22+PopulatedPlaceGeoID%3a%22YWZlNTQzZmYtNzFlMi00ZWQ0LWFjMjAtNDk0ZjQ5MjI3MTM3Iw%3d%3d%22+GeoIds%3a%22YWZlNTQzZmYtNzFlMi00ZWQ0LWFjMjAtNDk0ZjQ5MjI3MTM3JHBvcHVsYXRlZHBsYWNlIw%3d%3d%22+mltype%3a%221%22+eltypedim1%3a%22Event%22+secq%3a%22All+Events+Events+in+Philadelphia%22+tsource%3a%22events%22+supwlcar%3a%221%22+eventdg%3a%22false%22+segment%3a%22generic.carousel%22+ctype%3a%224%22+UserId%3a%22E2668640D09481C26C4D615EFFFFFFFF%22')
+    driver.get('https://www.bing.com/search?q=All+Events+Events+in+Pittsburgh&filters=latlong%3a%2240.442169189453125%2c-79.99495697021484%22+location%3a%22Pittsburgh%22+eventcity%3a%2267b9bd42-dc58-455c-9858-ece11da6a2fd%22+catesegtype%3a%22ZXZlbnRfY2l0eQ%3d%3d%22+eventsgroup%3a%22MTQw%22+date%3a%2220250103_20250331%22+PopulatedPlaceGeoID%3a%22MzAzMGE4NTctNWQ4YS00MzRkLWJlNGYtZDA1YWNjMDIxM2UwIw%3d%3d%22+GeoIds%3a%22MzAzMGE4NTctNWQ4YS00MzRkLWJlNGYtZDA1YWNjMDIxM2UwJHBvcHVsYXRlZHBsYWNlIw%3d%3d%22+mltype%3a%221%22+eltypedim1%3a%22Event%22+secq%3a%22All+Events+Events+in+Pittsburgh%22+tsource%3a%22events%22+supwlcar%3a%221%22+eventdg%3a%22false%22+segment%3a%22generic.carousel%22+ctype%3a%224%22+UserId%3a%22E2668640D09481C26C4D615EFFFFFFFF%22')
     time.sleep(5)
 
     html = driver.page_source
@@ -33,6 +37,8 @@ def scrape():
 
     #scrape
     for a in a_elements:
+        href = a.get('href')
+        img = a.find("img").get('src')
         tit = a.find("span", class_="tit").get_text(strip=True)
         cat = a.find("div", class_ = "evtcat").get_text(strip=True)
         b_factrows = a.find_all("div", class_="b_factrow")
@@ -43,7 +49,10 @@ def scrape():
         meta_divs = float_meta.find_all("div")
         d = meta_divs[0].get_text(strip=True)
         w = meta_divs[1].get_text(strip=True)
-        
+
+        further = "https://www.bing.com/" + href
+        scrape_further(further, driver)
+
         data = Event_Container();
         data.title = tit;
         data.category = cat;
@@ -57,16 +66,33 @@ def scrape():
     driver.quit()
     return data_list;
 
+def scrape_further(url, driver):
+    """Scrape additional details from the 'further' URL."""
+    driver.get(url)
+    time.sleep(3)
+
+    html = driver.page_source
+    soup = BeautifulSoup(html, 'html.parser')
+    details = soup.find('p', class_='b_paractl')
+    if details:
+        description = details.find('span').get('title')
+    else:
+        description = "No descriptions for this event yet."
+    tickets = soup.find('td', class_='evt_logoCell')
+    link = tickets.find('a').get('href')
+    return details.get_text(strip=True) if details else "No further details available"
+
 def insert():
     datalist = scrape();
-    for event in datalist:
-        Events.objects.create(
-            title=event.title,
-            category=event.category,
-            location=event.location,
-            month=event.month,
-            day=event.day,
-            weekday=event.weekday,
-            time=event.time,
-        )
+    # for event in datalist:
+    #     Events.objects.create(
+    #         title=event.title,
+    #         category=event.category,
+    #         location=event.location,
+    #         month=event.month,
+    #         day=event.day,
+    #         weekday=event.weekday,
+    #         time=event.time,
+    #     )
 
+insert()

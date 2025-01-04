@@ -1,17 +1,40 @@
-import React from "react";
+import React, {useState} from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, ImageBackground, ScrollView, Linking } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from "expo-router";
 import { useRoute } from "@react-navigation/native";
+import { useAuth } from "./AuthContext";
 
 const DetailScreen = () => {
   const router = useRoute();
   const event = router.params.event;
   const navigation = useNavigation();
+  const { account } = useAuth();
+  const [liked, setLiked] = useState(event.liked);
 
   const handleCalendar = async () => {
     navigation.navigate("calendar");
   }
+
+  const toggleLike = async () => {
+
+    const action = liked ? "remove" : "add";
+    setLiked(!liked);
+  
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/add-likes/?username=${account}&event=${event.id}&action=${action}`
+      );
+  
+      if (!response.ok) {
+        window.alert("Failed to update like status on the server");
+        setLiked(!liked);
+      }
+    } catch (error) {
+        window.alert("Failed to update like status on the server");
+        setLiked(!liked);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -27,11 +50,11 @@ const DetailScreen = () => {
               style={styles.calendarIcon}
             />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={toggleLike}>
             <Ionicons
-              name={'heart-outline'}
+              name={liked ? 'heart' : 'heart-outline'}
               size={32}
-              color={'white'}
+              color={liked ? '#4E4AFD' : 'white'}
             />
           </TouchableOpacity>
         </View>

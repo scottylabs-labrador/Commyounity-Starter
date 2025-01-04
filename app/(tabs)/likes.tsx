@@ -69,8 +69,8 @@ const EventList = () => {
     }
   };
 
-  const handleEventCard = () => {
-    navigation.navigate("detail");
+  const handleEventCard = (event: Event) => {
+    navigation.navigate('detail', { event });
   };
 
   const toggleLike = async (eventId: string) => {
@@ -111,7 +111,7 @@ const EventList = () => {
   };
   
   const renderItem = ({ item }: any) => (
-    <TouchableOpacity style={styles.eventCard} onPress={handleEventCard}>
+    <TouchableOpacity style={styles.eventCard} onPress={()=>handleEventCard(item)}>
       <View style={styles.eventImage}></View>
       <View style={styles.eventTextContainer}>
         <Text style={styles.eventName}>{item.name}</Text>

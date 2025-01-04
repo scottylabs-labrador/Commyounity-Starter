@@ -29,6 +29,7 @@ interface Event {
   date: string;
   time: string;
   tags: string;
+  liked: boolean;
 }
 
 const MyCalendar = () => {
@@ -53,7 +54,8 @@ const MyCalendar = () => {
           day: item.day,
           date: `${item.month} ${item.day} ${item.year || ''}`, // Format date
           time: item.time,
-          tags: item.category.toLowerCase()
+          tags: item.category.toLowerCase(),
+          liked: true,
         }));
         setEvents(transformedEvents);
 
@@ -90,8 +92,8 @@ const MyCalendar = () => {
     setCurrentEvents(filteredEvents);
   };
 
-  const handleEventCard = () => {
-    navigation.navigate("detail");
+  const handleEventCard = (event: Event) => {
+    navigation.navigate('detail', { event });
   };
 
   const markedDates = {
@@ -124,7 +126,7 @@ const MyCalendar = () => {
       />
       <ScrollView style={styles.eventList}>
         {currentEvents.map(item => (
-          <TouchableOpacity key={item.id} onPress={handleEventCard}>
+          <TouchableOpacity key={item.id} onPress={() => handleEventCard(item)}>
             <View style={styles.eventCard}>
               <View style={styles.eventImage}></View>
               <View style={styles.eventTextContainer}>

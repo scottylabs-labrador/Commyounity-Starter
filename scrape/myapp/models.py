@@ -5,6 +5,9 @@ import uuid
 class Events(models.Model):
     title = models.CharField(max_length=255)
     category = models.CharField(max_length=255)
+    description = models.CharField(max_length=10000)
+    link = models.CharField(max_length=10000)
+    img = models.CharField(max_length=10000)
     location = models.CharField(max_length=255)
     month = models.CharField(max_length=20)
     day = models.IntegerField()
