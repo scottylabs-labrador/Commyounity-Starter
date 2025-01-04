@@ -11,10 +11,23 @@ const DetailScreen = () => {
   const navigation = useNavigation();
   const { account } = useAuth();
   const [liked, setLiked] = useState(event.liked);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showExpandButton, setShowExpandButton] = useState(false);
+  const lineHeight = 20; // this should be the same as in style
+  const maxLines = 3;
 
   const handleCalendar = async () => {
     navigation.navigate("calendar");
   }
+
+  const handleTextLayout = (e) => {
+    const fullHeight = e.nativeEvent.layout.height;
+    const maxHeight = maxLines * lineHeight;
+    if (fullHeight > maxHeight) { 
+      // more than 3 lines, need to have expand/show button
+      setShowExpandButton(true); 
+    }
+  };
 
   const toggleLike = async () => {
 
@@ -63,12 +76,26 @@ const DetailScreen = () => {
       {/* Description */}
       <View style={styles.descriptionSection}>
         <Text style={styles.descriptionLabel}>Description:</Text>
-        <Text style={styles.descriptionText}>
-          Pretend this is a description of an event. I know I could’ve just done filler text but I’m just writing this
-          anyway. Idk how long you guys want this so I’m just gonna stop here at 4 lines? and it can expand too.
+        {/* should limit to 3 lines if there is a button & it is hidden*/}
+        <Text 
+          style= {styles.descriptionText}
+          numberOfLines={showExpandButton && !isExpanded ? 3 : undefined}
+          ellipsizeMode="tail"
+          onLayout={handleTextLayout}
+        >
+          {event.description}
         </Text>
-        <TouchableOpacity onPress={() => Linking.openURL("https://and_then_this_is_a_url.comorwhatever")}>
-          <Text style={styles.readMore}>Read more...</Text>
+        {/* show button only if enabled */}
+        {/* expand only if enabled */}
+        {showExpandButton && (
+          <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
+            <Text style={styles.expand}>
+              {isExpanded ? "Show less" : "Expand"}
+            </Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity onPress={() => Linking.openURL(event.link)}>
+          <Text style={styles.readMore}>See external link...</Text>
         </TouchableOpacity>
       </View>
 
@@ -100,7 +127,7 @@ const DetailScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "#FFFFFF"
   },
   header: {
@@ -138,9 +165,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#A1A1A1",
     marginTop: 8,
+    lineHeight: 20
+  },
+  expand: {
+    color: "#A1A1A1",
+    textDecorationLine: "underline",
+    marginTop: 3,
   },
   readMore: {
-    color: "#A1A1A1",
+    color: "#C5B9FF",
     textDecorationLine: "underline",
     marginTop: 3,
   },

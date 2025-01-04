@@ -12,6 +12,9 @@ import time
 class Event_Container:
     def __init__(self):
         self.title = "";
+        self.link = "";
+        self.description = "";
+        self.img = "";
         self.category = "";
         self.location = "";
         self.month = "";
@@ -36,10 +39,15 @@ def scrape():
     data_list = []
 
     #scrape
-    for a in a_elements:
+    for a in a_elements[:50]:
         href = a.get('href')
-        img = a.find("img").get('src')
+        pic = a.find("img")
+        if pic:
+            img = pic.get('src')
+        else:
+            img = 'https://th.bing.com/th/id/R.9a9c1c16fa8996110c9adbc61606d846?rik=orOrMrRCl%2by0MA&pid=ImgRaw&r=0'
         tit = a.find("span", class_="tit").get_text(strip=True)
+        print(tit)
         cat = a.find("div", class_ = "evtcat").get_text(strip=True)
         b_factrows = a.find_all("div", class_="b_factrow")
         loc = b_factrows[1].get_text(strip=True)
@@ -51,11 +59,14 @@ def scrape():
         w = meta_divs[1].get_text(strip=True)
 
         further = "https://www.bing.com/" + href
-        scrape_further(further, driver)
+        description, link = scrape_further(further, driver)
 
         data = Event_Container();
         data.title = tit;
         data.category = cat;
+        data.description = description
+        data.img = img
+        data.link = link
         data.location = loc;
         data.time = tim;
         data.month = m;
@@ -78,21 +89,28 @@ def scrape_further(url, driver):
         description = details.find('span').get('title')
     else:
         description = "No descriptions for this event yet."
+    if description:
+        pass
+    else:
+        description = "No descriptions for this event yet."
     tickets = soup.find('td', class_='evt_logoCell')
     link = tickets.find('a').get('href')
-    return details.get_text(strip=True) if details else "No further details available"
+    return description, link
 
 def insert():
     datalist = scrape();
-    # for event in datalist:
-    #     Events.objects.create(
-    #         title=event.title,
-    #         category=event.category,
-    #         location=event.location,
-    #         month=event.month,
-    #         day=event.day,
-    #         weekday=event.weekday,
-    #         time=event.time,
-    #     )
+    for event in datalist:
+        Events.objects.create(
+            title=event.title,
+            category=event.category,
+            description=event.description,
+            img=event.img,
+            link=event.link,
+            location=event.location,
+            month=event.month,
+            day=event.day,
+            weekday=event.weekday,
+            time=event.time,
+        )
 
 insert()

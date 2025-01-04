@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../AuthContext';
@@ -11,6 +11,9 @@ import SmileyFaceSmall from '@/components/SmileyFaceSmall';
 interface Event {
   id: string;
   name: string;
+  link: string;
+  img: string;
+  description: string;
   date: string;
   time: string;
   tags: string;
@@ -46,6 +49,9 @@ const EventList = ({ keyword }: EventListProps) => {
       const transformedEvents: Event[] = data.map((item: any): Event => ({
         id: item.id.toString(),
         name: item.title,
+        img: item.img,
+        description: item.description,
+        link: item.link,
         date: `${item.month} ${item.day} ${item.year || ''}`, // Format date
         time: item.time,
         tags: item.category.toLowerCase(),
@@ -158,7 +164,9 @@ const EventList = ({ keyword }: EventListProps) => {
   const renderItem = ({ item }: any) => (
     <TouchableOpacity onPress={() => handleEventCard(item)}>
       <View style={styles.eventCard}>
-        <View style={styles.eventImage}></View>
+        <View style={styles.eventImage}>
+          <Image source={{ uri: item.img }} style={styles.image} />
+        </View>
         <View style={styles.eventTextContainer}>
           <Text style={styles.eventName}>{item.name}</Text>
           <Text style={styles.eventDate}>{item.date}</Text>
@@ -301,5 +309,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#C5B9FF",
     alignSelf: 'center',
-  }
+  },
+  image: {
+    margin: 5,
+    width: 90,
+    height: 90,
+    borderRadius: 9,
+    resizeMode: "cover",
+  },
 });
