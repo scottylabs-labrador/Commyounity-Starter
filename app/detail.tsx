@@ -54,6 +54,7 @@ const DetailScreen = () => {
       {/* Header Section */}
       <ImageBackground
         style={styles.header}
+        source={{ uri: event.img }}
       >
         <Text style={styles.eventTitle}>{event.name}</Text>
         <View style={styles.iconGroup}>
@@ -141,17 +142,27 @@ const styles = StyleSheet.create({
     paddingVertical: 5
   },
   iconGroup: {
-    flexDirection: "row"
+    flexDirection: "row",
+    backgroundColor: "#C5B9FF",
+    paddingLeft: 6,
+    paddingRight: 3,
+    paddingTop: 3,
+    paddingBottom: 1,
+    borderRadius: 6
   },
   calendarIcon: {
     width: 25,
     height: 27,
-    marginRight: 10,
+    marginRight: 13,
     marginTop: 3
   },
   eventTitle: {
     fontSize: 26,
     fontWeight: "bold",
+    color: "#FFFFFF",
+    textShadowColor: "#000000",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10
   },
   descriptionSection: {
     marginHorizontal: 22,

@@ -29,7 +29,7 @@ def scrape():
     options = Options()
     options.add_argument('--lang=en-US')
     driver = webdriver.Edge(service=service, options=options)
-    driver.get('https://www.bing.com/search?q=All+Events+Events+in+Pittsburgh&filters=latlong%3a%2240.442169189453125%2c-79.99495697021484%22+location%3a%22Pittsburgh%22+eventcity%3a%2267b9bd42-dc58-455c-9858-ece11da6a2fd%22+catesegtype%3a%22ZXZlbnRfY2l0eQ%3d%3d%22+eventsgroup%3a%22MTQw%22+date%3a%2220250103_20250331%22+PopulatedPlaceGeoID%3a%22MzAzMGE4NTctNWQ4YS00MzRkLWJlNGYtZDA1YWNjMDIxM2UwIw%3d%3d%22+GeoIds%3a%22MzAzMGE4NTctNWQ4YS00MzRkLWJlNGYtZDA1YWNjMDIxM2UwJHBvcHVsYXRlZHBsYWNlIw%3d%3d%22+mltype%3a%221%22+eltypedim1%3a%22Event%22+secq%3a%22All+Events+Events+in+Pittsburgh%22+tsource%3a%22events%22+supwlcar%3a%221%22+eventdg%3a%22false%22+segment%3a%22generic.carousel%22+ctype%3a%224%22+UserId%3a%22E2668640D09481C26C4D615EFFFFFFFF%22')
+    driver.get('https://www.bing.com/search?q=All+Events+Events+in+New+York&filters=latlong%3a%2240.71304702758789%2c-74.00723266601562%22+location%3a%22New+York%22+eventcity%3a%2260d5dc2b-c915-460b-b722-c9e3485499ca%22+catesegtype%3a%22ZXZlbnRfY2l0eQ%3d%3d%22+eventsgroup%3a%22MTQw%22+date%3a%2220250104_20250331%22+PopulatedPlaceGeoID%3a%22NWI5ZGQ2YzYtZjAwNi00Zjg0LWI5YjItNjUwMzQ3Y2U3MjBkIw%3d%3d%22+GeoIds%3a%22NWI5ZGQ2YzYtZjAwNi00Zjg0LWI5YjItNjUwMzQ3Y2U3MjBkJHBvcHVsYXRlZHBsYWNlIw%3d%3d%22+mltype%3a%221%22+eltypedim1%3a%22Event%22+secq%3a%22All+Events+Events+in+New+York%22+tsource%3a%22events%22+supwlcar%3a%221%22+eventdg%3a%22false%22+segment%3a%22generic.carousel%22+ctype%3a%224%22+UserId%3a%22E2668640D09481C26C4D615EFFFFFFFF%22')
     time.sleep(5)
 
     html = driver.page_source
@@ -45,7 +45,7 @@ def scrape():
         if pic:
             img = pic.get('src')
         else:
-            img = 'https://th.bing.com/th/id/R.9a9c1c16fa8996110c9adbc61606d846?rik=orOrMrRCl%2by0MA&pid=ImgRaw&r=0'
+            img = 'https://www.bing.com/search?q=All+Events+Events+in+Boston&filters=latlong%3a%2242.35899353027344%2c-71.05863189697266%22+location%3a%22Boston%22+eventcity%3a%22f0f5899a-361f-4fe4-89d1-11130aa2c653%22+catesegtype%3a%22ZXZlbnRfY2l0eQ%3d%3d%22+eventsgroup%3a%22MTQw%22+date%3a%2220250104_20250331%22+PopulatedPlaceGeoID%3a%22NTRkMDA0MWItYmNmNi00Yzc2LWE0NzMtYmFmMGE3ODFjOTI1Iw%3d%3d%22+GeoIds%3a%22NTRkMDA0MWItYmNmNi00Yzc2LWE0NzMtYmFmMGE3ODFjOTI1JHBvcHVsYXRlZHBsYWNlIw%3d%3d%22+mltype%3a%221%22+eltypedim1%3a%22Event%22+secq%3a%22All+Events+Events+in+Boston%22+tsource%3a%22events%22+supwlcar%3a%221%22+eventdg%3a%22false%22+segment%3a%22generic.carousel%22+ctype%3a%224%22+UserId%3a%22E2668640D09481C26C4D615EFFFFFFFF%22'
         tit = a.find("span", class_="tit").get_text(strip=True)
         print(tit)
         cat = a.find("div", class_ = "evtcat").get_text(strip=True)

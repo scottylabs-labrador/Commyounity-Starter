@@ -1,37 +1,51 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 
-const App = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showExpandButton, setShowExpandButton] = useState(false);
-  const lineHeight = 24; // Line height for the text
-  const maxLines = 3;
+const FilterButton = () => {
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
 
-  const handleTextLayout = (e) => {
-    console.log("aaaaa")
-    const fullHeight = e.nativeEvent.layout.height;
-    const maxHeight = maxLines * lineHeight;
-    if (fullHeight > maxHeight) {
-      setShowExpandButton(true);
-    }
+  // Sample choices
+  const timeChoices = ['Today', 'Tomorrow', 'This Week', 'Next Week', 'This Month'];
+  const categoryChoices = ['Music', 'Play', 'Food', 'Hockey'];
+
+  const toggleFilterVisibility = () => {
+    setIsFilterVisible(!isFilterVisible);
   };
 
   return (
     <View style={styles.container}>
-      <Text
-        style={[
-          styles.text,
-          isExpanded || !showExpandButton ? null : { height: maxLines * lineHeight, overflow: "hidden" },
-        ]}
-        onLayout={handleTextLayout}
-      >
-        This is a long description. This is a long description. This is a long description.
-        This is a long description. This is a long description. This is a long description.
-      </Text>
-      {showExpandButton && (
-        <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
-          <Text style={styles.expandButton}>Expand</Text>
-        </TouchableOpacity>
+      <TouchableOpacity onPress={toggleFilterVisibility} style={styles.button}>
+        <Text style={styles.buttonText}>Filter</Text>
+      </TouchableOpacity>
+
+      {isFilterVisible && (
+        <View style={styles.filterOptions}>
+          <View style={styles.filterGroup}>
+            <Text style={styles.filterTitle}>Time</Text>
+            <FlatList
+              data={timeChoices}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.choice}>
+                  <Text>{item}</Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => item}
+            />
+          </View>
+
+          <View style={styles.filterGroup}>
+            <Text style={styles.filterTitle}>Categories</Text>
+            <FlatList
+              data={categoryChoices}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.choice}>
+                  <Text>{item}</Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => item}
+            />
+          </View>
+        </View>
       )}
     </View>
   );
@@ -39,19 +53,34 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#FFF",
+    padding: 10,
   },
-  text: {
-    fontSize: 16,
-    lineHeight: 24,
+  button: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    borderRadius: 5,
   },
-  expandButton: {
-    marginTop: 8,
-    color: "blue",
-    textDecorationLine: "underline",
+  buttonText: {
+    color: '#fff',
+    textAlign: 'center',
+  },
+  filterOptions: {
+    marginTop: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+  },
+  filterGroup: {
+    marginBottom: 10,
+  },
+  filterTitle: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  choice: {
+    padding: 5,
   },
 });
 
-export default App;
+export default FilterButton;
