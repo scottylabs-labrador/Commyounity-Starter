@@ -1,23 +1,60 @@
-import React from "react";
+import React, {useState} from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, ImageBackground, ScrollView, Linking } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from "expo-router";
 import { useRoute } from "@react-navigation/native";
+import { useAuth } from "./AuthContext";
 
 const DetailScreen = () => {
   const router = useRoute();
   const event = router.params.event;
   const navigation = useNavigation();
+  const { account } = useAuth();
+  const [liked, setLiked] = useState(event.liked);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showExpandButton, setShowExpandButton] = useState(false);
+  const lineHeight = 20; // this should be the same as in style
+  const maxLines = 3;
 
   const handleCalendar = async () => {
     navigation.navigate("calendar");
   }
+
+  const handleTextLayout = (e) => {
+    const fullHeight = e.nativeEvent.layout.height;
+    const maxHeight = maxLines * lineHeight;
+    if (fullHeight > maxHeight) { 
+      // more than 3 lines, need to have expand/show button
+      setShowExpandButton(true); 
+    }
+  };
+
+  const toggleLike = async () => {
+
+    const action = liked ? "remove" : "add";
+    setLiked(!liked);
+  
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/add-likes/?username=${account}&event=${event.id}&action=${action}`
+      );
+  
+      if (!response.ok) {
+        window.alert("Failed to update like status on the server");
+        setLiked(!liked);
+      }
+    } catch (error) {
+        window.alert("Failed to update like status on the server");
+        setLiked(!liked);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header Section */}
       <ImageBackground
         style={styles.header}
+        source={{ uri: event.img }}
       >
         <Text style={styles.eventTitle}>{event.name}</Text>
         <View style={styles.iconGroup}>
@@ -27,11 +64,11 @@ const DetailScreen = () => {
               style={styles.calendarIcon}
             />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={toggleLike}>
             <Ionicons
-              name={'heart-outline'}
+              name={liked ? 'heart' : 'heart-outline'}
               size={32}
-              color={'white'}
+              color={liked ? '#4E4AFD' : 'white'}
             />
           </TouchableOpacity>
         </View>
@@ -40,12 +77,26 @@ const DetailScreen = () => {
       {/* Description */}
       <View style={styles.descriptionSection}>
         <Text style={styles.descriptionLabel}>Description:</Text>
-        <Text style={styles.descriptionText}>
-          Pretend this is a description of an event. I know I could’ve just done filler text but I’m just writing this
-          anyway. Idk how long you guys want this so I’m just gonna stop here at 4 lines? and it can expand too.
+        {/* should limit to 3 lines if there is a button & it is hidden*/}
+        <Text 
+          style= {styles.descriptionText}
+          numberOfLines={showExpandButton && !isExpanded ? 3 : undefined}
+          ellipsizeMode="tail"
+          onLayout={handleTextLayout}
+        >
+          {event.description}
         </Text>
-        <TouchableOpacity onPress={() => Linking.openURL("https://and_then_this_is_a_url.comorwhatever")}>
-          <Text style={styles.readMore}>Read more...</Text>
+        {/* show button only if enabled */}
+        {/* expand only if enabled */}
+        {showExpandButton && (
+          <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
+            <Text style={styles.expand}>
+              {isExpanded ? "Show less" : "Expand"}
+            </Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity onPress={() => Linking.openURL(event.link)}>
+          <Text style={styles.readMore}>See external link...</Text>
         </TouchableOpacity>
       </View>
 
@@ -77,7 +128,7 @@ const DetailScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "#FFFFFF"
   },
   header: {
@@ -91,17 +142,27 @@ const styles = StyleSheet.create({
     paddingVertical: 5
   },
   iconGroup: {
-    flexDirection: "row"
+    flexDirection: "row",
+    backgroundColor: "#C5B9FF",
+    paddingLeft: 6,
+    paddingRight: 3,
+    paddingTop: 3,
+    paddingBottom: 1,
+    borderRadius: 6
   },
   calendarIcon: {
     width: 25,
     height: 27,
-    marginRight: 10,
+    marginRight: 13,
     marginTop: 3
   },
   eventTitle: {
     fontSize: 26,
     fontWeight: "bold",
+    color: "#FFFFFF",
+    textShadowColor: "#000000",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10
   },
   descriptionSection: {
     marginHorizontal: 22,
@@ -115,9 +176,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#A1A1A1",
     marginTop: 8,
+    lineHeight: 20
+  },
+  expand: {
+    color: "#A1A1A1",
+    textDecorationLine: "underline",
+    marginTop: 3,
   },
   readMore: {
-    color: "#A1A1A1",
+    color: "#C5B9FF",
     textDecorationLine: "underline",
     marginTop: 3,
   },

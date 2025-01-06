@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Touchable } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Touchable, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../AuthContext';
@@ -10,6 +10,9 @@ import SmileyFaceSmall from '@/components/SmileyFaceSmall';
 interface Event {
   id: string;
   name: string;
+  link: string;
+  img: string;
+  description: string;
   date: string;
   time: string;
   tags: string;
@@ -35,6 +38,9 @@ const EventList = () => {
       const transformedEvents = data.map((item: any) => ({
         id: item.id.toString(),
         name: item.title,
+        img: item.img,
+        description: item.description,
+        link: item.link,
         date: `${item.month} ${item.day}, ${item.year || ''}`, // Format date using month and day
         time: item.time,
         tags: item.category.toLowerCase(),
@@ -69,8 +75,8 @@ const EventList = () => {
     }
   };
 
-  const handleEventCard = () => {
-    navigation.navigate("detail");
+  const handleEventCard = (event: Event) => {
+    navigation.navigate('detail', { event });
   };
 
   const toggleLike = async (eventId: string) => {
@@ -111,8 +117,10 @@ const EventList = () => {
   };
   
   const renderItem = ({ item }: any) => (
-    <TouchableOpacity style={styles.eventCard} onPress={handleEventCard}>
-      <View style={styles.eventImage}></View>
+    <TouchableOpacity style={styles.eventCard} onPress={()=>handleEventCard(item)}>
+      <View style={styles.eventImage}>
+        <Image source={{ uri: item.img }} style={styles.image} />
+      </View>
       <View style={styles.eventTextContainer}>
         <Text style={styles.eventName}>{item.name}</Text>
         <Text style={styles.eventDate}>{item.date}</Text>
@@ -239,5 +247,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#C5B9FF",
     alignSelf: 'center',
-  }
+  },
+  image: {
+    margin: 5,
+    width: 90,
+    height: 90,
+    borderRadius: 9,
+    resizeMode: "cover",
+  },
 });

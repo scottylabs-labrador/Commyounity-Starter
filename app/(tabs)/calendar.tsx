@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Modal, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Modal, Text, ScrollView, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from "../AuthContext";
@@ -24,11 +24,15 @@ const monthMap: Record<string, string> = {
 interface Event {
   id: string;
   name: string;
+  link: string;
+  img: string;
+  description: string;
   month: string;
   day: number;
   date: string;
   time: string;
   tags: string;
+  liked: boolean;
 }
 
 const MyCalendar = () => {
@@ -49,11 +53,15 @@ const MyCalendar = () => {
         const transformedEvents: Event[] = data.map((item: any): Event => ({
           id: item.id.toString(),
           name: item.title,
+          img: item.img,
+          description: item.description,
+          link: item.link,
           month: item.month,
           day: item.day,
           date: `${item.month} ${item.day} ${item.year || ''}`, // Format date
           time: item.time,
-          tags: item.category.toLowerCase()
+          tags: item.category.toLowerCase(),
+          liked: true,
         }));
         setEvents(transformedEvents);
 
@@ -90,8 +98,8 @@ const MyCalendar = () => {
     setCurrentEvents(filteredEvents);
   };
 
-  const handleEventCard = () => {
-    navigation.navigate("detail");
+  const handleEventCard = (event: Event) => {
+    navigation.navigate('detail', { event });
   };
 
   const markedDates = {
@@ -124,9 +132,11 @@ const MyCalendar = () => {
       />
       <ScrollView style={styles.eventList}>
         {currentEvents.map(item => (
-          <TouchableOpacity key={item.id} onPress={handleEventCard}>
+          <TouchableOpacity key={item.id} onPress={() => handleEventCard(item)}>
             <View style={styles.eventCard}>
-              <View style={styles.eventImage}></View>
+              <View style={styles.eventImage}>
+                <Image source={{ uri: item.img }} style={styles.image} />
+              </View>
               <View style={styles.eventTextContainer}>
                 <Text style={styles.eventName}>{item.name}</Text>
                 <Text style={styles.eventDate}>{item.date}</Text>
@@ -182,7 +192,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#C5B9FF",
     alignSelf: 'center',
-  }
+  },
+  image: {
+    margin: 5,
+    width: 90,
+    height: 90,
+    borderRadius: 9,
+    resizeMode: "cover",
+  },
 });
 
 
