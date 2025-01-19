@@ -42,7 +42,7 @@ const MyCalendar = () => {
   const [currentEvents, setCurrentEvents] = useState<Event[]>([]);
   const { account } = useAuth();
   const navigation = useNavigation();
-  const today = new Date().toISOString().split('T')[0]; 
+  const today = new Date().toLocaleDateString('en-CA'); 
   const segments = useSegments();
 
   useEffect(() => {
@@ -75,6 +75,7 @@ const MyCalendar = () => {
           return acc;
         }, {});
         setLikedDates(formattedDates);
+        console.log(today)
       } catch (error) {
         console.error('Error fetching liked events:', error);
       }
@@ -90,7 +91,7 @@ const MyCalendar = () => {
       const eventDate = new Date(
         new Date(day.dateString).getFullYear(),
         parseInt(monthMap[event.month.toUpperCase()], 10) - 1,
-        event.day + 1
+        event.day
       );
       return eventDate.toISOString().split('T')[0] === day.dateString;
     });
