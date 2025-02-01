@@ -190,3 +190,4 @@ def add_user_event(request):
         return Response({"message": "User events updated successfully"}, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    

@@ -3,7 +3,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Events, User
-from .serializers import EventSerializer
+from .serializers import EventSerializer, UserSerializer
 
 class EventPagination(PageNumberPagination):
     page_size = 10
@@ -77,5 +77,24 @@ class UserLikes(APIView):
         paginated_events = paginator.paginate_queryset(matching_events, request)
         serializer = EventSerializer(paginated_events, many=True)
         
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+#api url: http://127.0.0.1:8000/api/userlist/search?q=Xi
+class UserListSearch(APIView):
+
+    pagination_class = EventPagination
+
+    def get(self, request):
+        query = request.query_params.get('q', None)
+
+        if(query):
+            events = User.objects.filter(nickname__icontains=query)
+        else:
+            events = User.objects.all()
+            
+        paginator = self.pagination_class()
+        paginated_events = paginator.paginate_queryset(events, request)
+        serializer = UserSerializer(paginated_events, many=True)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 

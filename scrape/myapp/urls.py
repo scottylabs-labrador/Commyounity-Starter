@@ -1,6 +1,6 @@
 # myapp/urls.py
 from django.urls import path
-from .views import EventList, EventListSearch, UserLikes
+from .views import EventList, EventListSearch, UserLikes, UserListSearch
 from .user import create_user_account, check_user_account, \
     update_user_preference, update_user_events, add_user_event, \
     verify_email, get_user_like_id, get_profile, update_profile
@@ -8,6 +8,7 @@ from .user import create_user_account, check_user_account, \
 urlpatterns = [
     path('eventlist/', EventList.as_view(), name='event-list'),
     path('eventlist/search', EventListSearch.as_view(), name='event-list-search'),
+    path('userlist/search', UserListSearch.as_view(), name='user-list-search'),
     path('create-account/', create_user_account, name='create-account'),
     path('check-account/', check_user_account, name="check-account"),
     path('get-profile/', get_profile, name="get-profile"),
