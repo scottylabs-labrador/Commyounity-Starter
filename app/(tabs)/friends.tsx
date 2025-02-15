@@ -109,6 +109,35 @@ const EventList = ({ keyword }: EventListProps) => {
       setPage((prevPage) => prevPage + 1);
     }
   };
+
+  const sendFriendRequest = async (username: string) => {
+    const senderId = account;
+    const receiverId = username;
+    
+    const url = `http://127.0.0.1:8000/api/send-request/?sender=${senderId}&receiver=${receiverId}`;
+  
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        console.log("Success:", data);
+        alert(data.success); // Show success message
+      } else {
+        console.error("Error:", data);
+        alert(data.error); // Show error message
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("Failed to send friend request. Check your connection.");
+    }
+  };
   
   const renderItem = ({ item }: any) => (
     <TouchableOpacity>
@@ -118,7 +147,7 @@ const EventList = ({ keyword }: EventListProps) => {
         <View style={styles.eventTextContainer}>
           <Text style={styles.eventName}>{item.nickname}</Text>
           <Text style={styles.eventDate}>{item.email}</Text>
-          <TouchableOpacity style={styles.reqButton}>
+          <TouchableOpacity style={styles.reqButton} onPress={() => sendFriendRequest(item.username)}>
             <Text style={styles.buttonText}>Request</Text>
           </TouchableOpacity>
         </View>
@@ -160,6 +189,9 @@ const App = () => {
         <Text style={styles.title}>
           Comm-<Text style={styles.highlight}>YOU</Text>-nity
         </Text>
+        <TouchableOpacity style={styles.mailIcon}>
+          <Ionicons name="mail" size={28} color="#4A61DD" />
+        </TouchableOpacity>
       </View>
       <View style={styles.header}>
         <TextInput
@@ -273,4 +305,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center"
   },
+  mailIcon:{
+    marginLeft: 50
+  }
 });

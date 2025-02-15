@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import User
+from .models import User, FriendRequest
 from .serializers import UserSerializer
 from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse
@@ -191,3 +191,25 @@ def add_user_event(request):
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
     
+# http://127.0.0.1:8000/api/send-request/?sender=8b1053ac-fffc-4a8f-b7f6-d6e3e4bba981&receiver=90950435-23f5-4ee1-b0e1-daeb2406a3ee
+@api_view(['GET'])
+def send_friend_request(request):
+    sender_id = request.query_params.get('sender', None)
+    receiver_id = request.query_params.get('receiver', None)
+    receiver = get_object_or_404(User, username=receiver_id)
+    sender = get_object_or_404(User, username=sender_id)
+
+    if sender == receiver:
+        return Response({"error": "You cannot send a friend request to yourself."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if request already exists
+    if FriendRequest.objects.filter(sender=sender, receiver=receiver).exists():
+        return Response({"error": "Friend request already sent."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if already friends
+    if sender.friends.filter(username=receiver.id).exists():
+        return Response({"error": "You are already friends."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Create and save the friend request
+    FriendRequest.objects.create(sender=sender, receiver=receiver)
+    return Response({"success": f"Friend request sent to {receiver.username}."}, status=status.HTTP_201_CREATED)

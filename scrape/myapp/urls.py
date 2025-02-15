@@ -3,7 +3,8 @@ from django.urls import path
 from .views import EventList, EventListSearch, UserLikes, UserListSearch
 from .user import create_user_account, check_user_account, \
     update_user_preference, update_user_events, add_user_event, \
-    verify_email, get_user_like_id, get_profile, update_profile
+    verify_email, get_user_like_id, get_profile, update_profile, \
+    send_friend_request
 
 urlpatterns = [
     path('eventlist/', EventList.as_view(), name='event-list'),
@@ -18,5 +19,6 @@ urlpatterns = [
     path('add-likes/', add_user_event, name="add-likes"),
     path('get-likes/', UserLikes.as_view(), name="get-likes"),
     path('get-likes-id/', get_user_like_id, name='get-likes-id'),
-    path('verify-email/', verify_email, name='verify-email')
+    path('verify-email/', verify_email, name='verify-email'),
+    path('send-request/', send_friend_request, name='send_request'),
 ]
