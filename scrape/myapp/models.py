@@ -39,6 +39,15 @@ class User(models.Model):
     verified = models.BooleanField(default=False)
     preference = ArrayField(models.CharField(max_length=100), blank=True, default=list)
     events = ArrayField(models.IntegerField(), blank=True, default=list)
+    # automatically adds
+    friends = models.ManyToManyField("self", blank=True)
 
     def __str__(self):
         return self.username
+
+class FriendRequest(models.Model):
+    # relates to keys in User model, deleted upon deletion of user
+    # user in User can access this Friendship field through the related name
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_friend_requests")
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_friend_requests")
+    created_at = models.DateTimeField(auto_now_add=True)

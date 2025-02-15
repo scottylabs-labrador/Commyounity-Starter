@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Image, Button } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../AuthContext';
@@ -118,6 +118,9 @@ const EventList = ({ keyword }: EventListProps) => {
         <View style={styles.eventTextContainer}>
           <Text style={styles.eventName}>{item.nickname}</Text>
           <Text style={styles.eventDate}>{item.email}</Text>
+          <TouchableOpacity style={styles.reqButton}>
+            <Text style={styles.buttonText}>Request</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
@@ -255,5 +258,19 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: 9,
     resizeMode: "cover",
+  },
+  reqButton: {
+    backgroundColor: "#4A61DD",
+    marginLeft: 120,
+    marginTop: 40,
+    height: 30,
+    width: 80,
+    padding: 3,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    textAlign: "center"
   },
 });
