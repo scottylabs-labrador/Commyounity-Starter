@@ -213,3 +213,24 @@ def send_friend_request(request):
     # Create and save the friend request
     FriendRequest.objects.create(sender=sender, receiver=receiver)
     return Response({"success": f"Friend request sent to {receiver.username}."}, status=status.HTTP_201_CREATED)
+
+# http://127.0.0.1:8000/api/get-request/?username=765ec0ee-4448-4856-89c1-64e7bd4ac8fb
+@api_view(['GET'])
+def get_friend_requests(request):
+    username = request.query_params.get('username', None)
+    user = get_object_or_404(User, username=username)
+    friend_requests = FriendRequest.objects.filter(receiver=user)
+
+    if not friend_requests.exists():
+        return Response({"message": "No pending friend requests."}, status=status.HTTP_200_OK)
+
+    requests_data = [
+        {
+            "sender": req.sender.username,
+            "receiver": req.receiver.username,
+            "id": req.id,
+        }
+        for req in friend_requests
+    ]
+    
+    return Response(requests_data, status=status.HTTP_200_OK)

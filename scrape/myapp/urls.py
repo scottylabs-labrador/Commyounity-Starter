@@ -4,7 +4,7 @@ from .views import EventList, EventListSearch, UserLikes, UserListSearch
 from .user import create_user_account, check_user_account, \
     update_user_preference, update_user_events, add_user_event, \
     verify_email, get_user_like_id, get_profile, update_profile, \
-    send_friend_request
+    send_friend_request, get_friend_requests
 
 urlpatterns = [
     path('eventlist/', EventList.as_view(), name='event-list'),
@@ -21,4 +21,5 @@ urlpatterns = [
     path('get-likes-id/', get_user_like_id, name='get-likes-id'),
     path('verify-email/', verify_email, name='verify-email'),
     path('send-request/', send_friend_request, name='send_request'),
+    path('get-request/', get_friend_requests, name='get_request'),
 ]
