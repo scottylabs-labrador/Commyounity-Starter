@@ -5,10 +5,16 @@ import { useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import { send, EmailJSResponseStatus } from '@emailjs/react-native';
 import SmileyFaceMedium from '@/components/SmileyFaceMedium';
+import { useFonts } from 'expo-font';
 
 export default function SignUpScreen() {
+
+    const [fontsLoaded] = useFonts({
+      'PixelifySans': require('@/assets/fonts/PixelifySans.ttf'), 
+      'Inter': require('@/assets/fonts/Inter.ttf'), 
+    });
+    const [nickname, setName] = useState<string | undefined>(undefined);
     const [email, setEmail] = useState<string | undefined>(undefined);
-    const [email2, setEmail2] = useState<string | undefined>(undefined);
     const [password, setPassword] = useState<string | undefined>(undefined);
     const [password2, setPassword2] = useState<string | undefined>(undefined);
     const [account, setAccount] = useState<string | undefined>(undefined);
@@ -16,11 +22,11 @@ export default function SignUpScreen() {
     const router = useRouter();
 
     const handleSignup = async () => {
-        if (!email || !email2) {
-            window.alert('Please enter email');
+        if (!nickname) {
+            window.alert('Please enter your name');
             return;
-        } else if (!(email === email2)) {
-            window.alert('Email does not match');
+        } else if (!email) {
+            window.alert('Please enter your email');
             return;
         } else if (!password || !password2) {
             window.alert('Please enter password');
@@ -32,6 +38,7 @@ export default function SignUpScreen() {
     
         const url = 'http://127.0.0.1:8000/api/create-account/';
         const payload = {
+            nickname, 
             password,
             email
         };
@@ -84,41 +91,36 @@ export default function SignUpScreen() {
     <View style={styles.container}>
       {/* Header Section */}
       <Text style={styles.title}>
-        Comm-<Text style={styles.highlight}>YOU</Text>-nity
+        Comm<Text style={styles.highlight}>(you)</Text>nity
       </Text>
-      <SmileyFaceMedium/>
+      {/* <SmileyFaceMedium/> */}
 
       {/* Form Section */}
       <View style={styles.form}>
-        <Text style={styles.label}>Email</Text>
+
         <TextInput 
             style={styles.input} 
-            placeholder="email" 
+            placeholder="Nickname" 
+            placeholderTextColor="#aaa" 
+            onChangeText={text => setName(text)}
+          />
+        <TextInput 
+            style={styles.input} 
+            placeholder="Email" 
             placeholderTextColor="#aaa" 
             onChangeText={text => setEmail(text)}
             />
 
-        <Text style={styles.label}>Confirm Email</Text>
-        <TextInput 
-            style={styles.input} 
-            placeholder="email" 
-            placeholderTextColor="#aaa" 
-            onChangeText={text => setEmail2(text)}
-            />
-
-        <Text style={styles.label}>Password</Text>
         <TextInput
           style={styles.input}
-          placeholder="password"
+          placeholder="Password"
           secureTextEntry
           placeholderTextColor="#aaa"
           onChangeText={text => setPassword(text)}
         />
-
-        <Text style={styles.label}>Confirm Password</Text>
         <TextInput
           style={styles.input}
-          placeholder="password"
+          placeholder="Password"
           secureTextEntry
           placeholderTextColor="#aaa"
           onChangeText={text => setPassword2(text)}
@@ -129,14 +131,15 @@ export default function SignUpScreen() {
       <TouchableOpacity 
       style={styles.button}
       onPress={handleSignup}>
-        <Text style={styles.buttonText}>Sign up</Text>
+        <Text style={styles.buttonText}>SIGN UP</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.link}
-        onPress={handleLogin}>
-        <Text style={styles.linktext}>Log in</Text>
-      </TouchableOpacity>
+      <View style={styles.loginRow}>
+        <Text style={styles.hintSignUp}>Already have an account? </Text>
+        <TouchableOpacity onPress={handleLogin}>
+          <Text style={styles.linktext}>Log in</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -151,12 +154,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
     color: '#000',
     marginBottom: 10,
+    fontFamily: "Inter",
+    fontWeight: '800',
   },
   highlight: {
     color: '#4E4AFD',
+    fontFamily: "Inter",
+    fontWeight: '800',
   },
   emojiContainer: {
     backgroundColor: '#FFFFCC',
@@ -175,33 +181,37 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 3,
+    fontSize: 20,
+    fontWeight: '500',
+    marginBottom: 5,
     color: '#000',
+    marginLeft: 10,
   },
   input: {
-    backgroundColor: '#F9F9F9',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    borderWidth: 1,
+    backgroundColor: '#F5F5F5',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 12,  
+    borderWidth: 0,
     borderColor: '#DDD',
-    marginBottom: 10,
-    color: '#000',
-    fontSize: 16,
+    marginBottom: 15,
+    color: '#868686',
+    fontSize: 14,
   },
   button: {
-    backgroundColor: '#C5B9FF',
-    borderRadius: 8,
-    width: '30%',
+    backgroundColor: '#4D4AF4',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 12,  
+    borderWidth: 0,
     alignItems: 'center',
-    paddingVertical: 10
+    width: '100%',  
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
+    fontFamily: "Inter",
   },
   link: {
     color: '#C1A6F1',
@@ -210,6 +220,19 @@ const styles = StyleSheet.create({
   },
   linktext: {
     color: '#C5B9FF',
-    textDecorationLine: "underline"
-  }
+    textDecorationLine: "underline",
+    marginTop: 10,
+  },
+  hintSignUp: {
+    color: '#868686',
+    fontSize: 14,
+    marginTop: 10,
+  },
+  loginRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  
 });

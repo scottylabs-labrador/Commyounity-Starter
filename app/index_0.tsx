@@ -5,16 +5,8 @@ import {
 import { useAuth } from './AuthContext';
 import { useRouter, useNavigation } from 'expo-router';
 import SmileyFace from '@/components/SmileyFace';
-import { useFonts } from 'expo-font';
-
 
 const LoginView: React.FC = () => {
-
-  const [fontsLoaded] = useFonts({
-    'PixelifySans': require('@/assets/fonts/PixelifySans.ttf'), 
-    'Inter': require('@/assets/fonts/Inter.ttf'), 
-  });
-
   
   const [email, setEmail] = useState<string | undefined>(undefined);
   const [password, setPassword] = useState<string | undefined>(undefined);
@@ -58,21 +50,23 @@ const LoginView: React.FC = () => {
     <View style={styles.container}>
 
       <Text style={styles.title}>
-        Comm<Text style={styles.highlight}>(you)</Text>nity
+        Comm-<Text style={styles.highlight}>YOU</Text>-nity
       </Text>
-      {/* <SmileyFace/> */}
+      <SmileyFace/>
 
       <View style={styles.form}>
-       
+        <Text style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder="email"
           underlineColorAndroid="transparent"
           onChangeText={text => setEmail(text)}
         />
+
+        <Text style={styles.label}>Password</Text>
         <TextInput
           style={styles.input}
-          placeholder="Password"
+          placeholder="password"
           secureTextEntry={true}
           underlineColorAndroid="transparent"
           onChangeText={text => setPassword(text)}
@@ -82,16 +76,14 @@ const LoginView: React.FC = () => {
       <TouchableOpacity
         style={styles.button}
         onPress={handleLogin}>
-        <Text style={styles.buttonText}>LOG IN</Text>
+        <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
-      <View style={styles.signupContainer}>
-          <Text style={styles.hintSignUp}>Don’t have an account yet? </Text>
-        <TouchableOpacity onPress={handleSignup}>
-          <Text style={styles.linktext}>Sign up</Text>
-        </TouchableOpacity>
-      </View>
-
+      <TouchableOpacity
+        style={styles.link}
+        onPress={handleSignup}>
+        <Text style={styles.linktext}>Sign up</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -103,19 +95,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-    
   },
   title: {
-    fontSize: 36,
-    fontWeight: '800',
+    fontSize: 32,
+    fontWeight: 'bold',
     color: '#000',
     marginBottom: 20,
-    fontFamily: "Inter",
   },
   highlight: {
     color: '#4E4AFD',
-    fontFamily: "Inter",
-    fontWeight: '800'
   },
   emojiContainer: {
     backgroundColor: '#FFFFCC',
@@ -131,40 +119,36 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '100%',
-    marginBottom: 15
+    marginBottom: 20
   },
   label: {
-    fontSize: 20,
-    fontWeight: '500',
+    fontSize: 14,
+    fontWeight: '600',
     marginBottom: 5,
     color: '#000',
-    marginLeft: 10,
   },
   input: {
-    backgroundColor: '#F5F5F5',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 12,  
-    borderWidth: 0,
+    backgroundColor: '#F9F9F9',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    borderWidth: 1,
     borderColor: '#DDD',
     marginBottom: 15,
-    color: '#868686',
-    fontSize: 14,
+    color: '#000',
+    fontSize: 16,
   },
   button: {
-    backgroundColor: '#4D4AF4',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 12,  
-    borderWidth: 0,
+    backgroundColor: '#C5B9FF',
+    borderRadius: 8,
+    width: '30%',
     alignItems: 'center',
-    width: '100%',  
+    paddingVertical: 10
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
-    fontFamily: "Inter",
   },
   link: {
     color: '#C1A6F1',
@@ -173,21 +157,8 @@ const styles = StyleSheet.create({
   },
   linktext: {
     color: '#C5B9FF',
-    textDecorationLine: "underline",
-    marginTop: 10,
-  },
-  hintSignUp: {
-    color: '#868686',
-    fontSize: 14,
-    marginTop: 10,
-  },
-  signupContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  
+    textDecorationLine: "underline"
+  }
 });
 
 export default LoginView;
