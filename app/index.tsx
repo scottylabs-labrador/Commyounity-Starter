@@ -36,7 +36,7 @@ const LoginView: React.FC = () => {
         Alert.alert('Login Successful', 'Welcome back!');
         const data = await response.json();
         setAccount(data.username)
-        router.push('/events');
+        router.push('/yourein');
       } else if (response.status === 404) {
         Alert.alert('Error', 'User not found.');
       } else if (response.status === 401) {
