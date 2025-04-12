@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Image, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Image, Button, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../AuthContext';
@@ -15,6 +15,13 @@ interface User {
   email: string;
 }
 
+interface Request {
+  id: string;
+  sender: string;
+  sender_n: string;
+  receiver: string;
+}
+
 interface EventListProps {
   keyword: string;
 }
@@ -28,6 +35,30 @@ const EventList = ({ keyword }: EventListProps) => {
   const flatListRef = useRef<FlatList>(null);
   const naviation = useNavigation();
   const segments = useSegments()
+  const [sentRequests, setSentRequests] = useState(new Set<string>());
+
+  const fetchRequests = async () => {
+    try {
+      const url = `http://127.0.0.1:8000/api/get-sents/?username=${account}`;
+      const response = await fetch(url);
+      const data = await response.json();
+  
+      const req: Request[] = data.map((item: any): Request => ({
+        id: item.id,
+        sender: item.sender,
+        sender_n: item.sender_n,
+        receiver: item.receiver,
+      }));
+
+      const requestSet = new Set(req.map(request => request.receiver));
+      setSentRequests(requestSet);
+  
+      console.log("Friend requests fetched:", req);
+      console.log("Sent requests set:", requestSet);
+    } catch (error) {
+      console.error("Error fetching friend requests:", error);
+    }
+  };
 
   const fetchEvents = async (pageNum: number) => {
     if (loading) return;
@@ -38,7 +69,6 @@ const EventList = ({ keyword }: EventListProps) => {
       const usernameParam = account ? `&username=${account}` : "";
       const keywordParam =  keyword ? `&q=${keyword}` : "";
       const url = `${baseUrl}${queryParams}${usernameParam}${keywordParam}`;
-
       const response = await fetch(url);
       const data = await response.json();
       const transformedEvents: User[] = data.map((item: any): User => ({
@@ -48,27 +78,19 @@ const EventList = ({ keyword }: EventListProps) => {
         email: item.email,
       }));
 
-      if(account){
-        const response_ = await fetch(`http://127.0.0.1:8000/api/get-likes-id/?username=${account}`);
-        const data_ = await response_.json();
-        const likes = data_.likes;
-  
-        const updatedEvents = transformedEvents.map((event) => {
-          return {
-            ...event,  // Keep all existing properties
-            liked: likes.includes(parseInt(event.id)) // Set liked to true if event id is in the likes array
-          };
-        });
+      const response_f = await fetch(`http://127.0.0.1:8000/api/get-friends/?username=${account}`);
+      const data_f = await response_f.json();
+      const friendsList = new Set(data_f[0].friends.map(friend => friend.username));
+      const nonFriends = transformedEvents.filter(user => !friendsList.has(user.username));
+      const nonSelf = nonFriends.filter(user => user.username != account);
 
-        setUsers((prevEvents) => [...prevEvents, ...updatedEvents]);
-      } else {
-        setUsers((prevEvents) => [...prevEvents, ...transformedEvents]);
-      }
+      setUsers((prevEvents) => [...prevEvents, ...nonSelf]);
+
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.error('Error fetching users and friends:', error);
       setEnded(true);
     } finally {
-      setLoading(false); // Stop loading after fetching
+      setLoading(false);
     }
   };
 
@@ -85,24 +107,29 @@ const EventList = ({ keyword }: EventListProps) => {
     setUsers([]);
     setPage(0);
     setEnded(false);
+    fetchRequests();
     if (flatListRef.current) {
       flatListRef.current.scrollToOffset({ animated: true, offset: 0 }); // Scroll to top when keyword changes
     }
   }, [account]);
 
-    useEffect(() => {
-      setUsers([]);
-      setPage(0);
-      setEnded(false);
-      if (flatListRef.current) {
-        flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
-      }
-     }, [segments])
+  useEffect(() => {
+    fetchRequests();
+    setUsers([]);
+    setPage(0);
+    setEnded(false);
+    if (flatListRef.current) {
+      flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
+    }
+    }, [segments])
 
   useEffect(() => {
     if(page === 0) setPage(1);
     else fetchEvents(page);
   }, [page]);
+
+  useEffect(() => {
+  }, [])
 
   const handleEndReached = () => {
     if (!loading && !ended) {
@@ -127,14 +154,11 @@ const EventList = ({ keyword }: EventListProps) => {
       const data = await response.json();
   
       if (response.ok) {
-        console.log("Success:", data);
-        alert(data.success); // Show success message
+        alert(data.success);
       } else {
-        console.error("Error:", data);
-        alert(data.error); // Show error message
+        alert(data.error);
       }
     } catch (error) {
-      console.error("Network error:", error);
       alert("Failed to send friend request. Check your connection.");
     }
   };
@@ -147,8 +171,14 @@ const EventList = ({ keyword }: EventListProps) => {
         <View style={styles.eventTextContainer}>
           <Text style={styles.eventName}>{item.nickname}</Text>
           <Text style={styles.eventDate}>{item.email}</Text>
-          <TouchableOpacity style={styles.reqButton} onPress={() => sendFriendRequest(item.username)}>
-            <Text style={styles.buttonText}>Request</Text>
+          <TouchableOpacity
+            style={[styles.reqButton, sentRequests.has(item.username) ? styles.disabledButton : {}]}
+            onPress={() => sendFriendRequest(item.username)}
+            disabled={sentRequests.has(item.username)} // Disable button if request exists
+          >
+            <Text style={styles.buttonText}>
+              {sentRequests.has(item.username) ? "Requested" : "Request"}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -169,10 +199,104 @@ const EventList = ({ keyword }: EventListProps) => {
   );
 };
 
+const MessageList = () => {
+  const [requests, setRequests] = useState<Request[]>([])
+  const [loading, setLoading] = useState(true);
+  const { account } = useAuth();
+
+  const fetchRequests = async () => {
+    if (account){
+      try{
+        const url = `http://127.0.0.1:8000/api/get-request/?username=${account}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        const req: Request[] = data.map((item: any): Request => ({
+          id: item.id,
+          sender: item.sender,
+          sender_n: item.sender_n,
+          receiver: item.receiver,
+        }));
+        setRequests(req)
+      } catch (error) {
+        console.error('Error fetching friend requests:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  }
+
+  const rejRequests = async (id, receiver) => {
+    if (account){
+      try{
+        const url = `http://127.0.0.1:8000/api/rej-request/?id=${id}&receiver=${receiver}`;
+        const response = await fetch(url);
+        if(response.ok){
+          alert("Successfully rejected request")
+        } else {
+          alert("Failed to reject request")
+        }
+      } catch (error) {
+        alert(error);
+      }
+    }
+  }
+
+  const accRequests = async (id, receiver) => {
+    if (account){
+      try{
+        const url = `http://127.0.0.1:8000/api/acc-request/?id=${id}&receiver=${receiver}`;
+        const response = await fetch(url);
+        if(response.ok){
+          alert("Successfully accepted request")
+        } else {
+          alert("Failed to accepted request")
+        }
+      } catch (error) {
+        alert(error);
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchRequests()
+  }, [])
+
+  return (
+    <View style={styles.messageList}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#4A61DD" />
+      ) : requests.length > 0 ? (
+        requests.map((request, index) => (
+          <View key={index}>
+            <Text style={styles.message}>
+              {request.sender_n} requested to be your friend
+            </Text>
+            <View style={{flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity onPress={() => {accRequests(request.id, request.receiver)}}>
+                <Text>Accept</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => {rejRequests(request.id, request.receiver)}}>
+                <Text>Ignore</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))
+      ) : (
+        <Text style={styles.noMessages}>No messages</Text>
+      )}
+    </View>
+  );
+}
+
 const App = () => {
 
   const [keyword, setKeyword] = useState('');
   const [query, setQuery] = useState('');
+  const [showMessages, setShowMessages] = useState(false);
+
+  const toggleMessages = () => {
+    setShowMessages(!showMessages);
+  };
 
   const handleInputChange = (input: string) => {
     setKeyword(input);
@@ -190,7 +314,7 @@ const App = () => {
           Comm-<Text style={styles.highlight}>YOU</Text>-nity
         </Text>
         <TouchableOpacity style={styles.mailIcon}>
-          <Ionicons name="mail" size={28} color="#4A61DD" />
+          <Ionicons name="mail" size={28} color="#4A61DD" onPress={toggleMessages}/>
         </TouchableOpacity>
       </View>
       <View style={styles.header}>
@@ -203,6 +327,12 @@ const App = () => {
             value={keyword}
           ></TextInput>
       </View>
+
+      {showMessages && (
+        <View style={styles.messageContainer}>
+          <MessageList />
+        </View>
+      )}
 
       {/* list of events */}
       <EventList keyword={query}/>
@@ -300,6 +430,9 @@ const styles = StyleSheet.create({
     padding: 3,
     borderRadius: 5,
   },
+  disabledButton: {
+    backgroundColor: "#ccc", // Gray out button
+  },
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
@@ -307,5 +440,40 @@ const styles = StyleSheet.create({
   },
   mailIcon:{
     marginLeft: 50
-  }
+  },
+  messageList: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  message: {
+    fontSize: 16,
+    paddingVertical: 5,
+  },
+  noMessages: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#999",
+  },
+  messageContainer: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5, 
+    width: 250, 
+    zIndex: 9999, 
+  },
 });

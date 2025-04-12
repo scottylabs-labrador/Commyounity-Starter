@@ -227,10 +227,84 @@ def get_friend_requests(request):
     requests_data = [
         {
             "sender": req.sender.username,
+            "sender_n": req.sender.nickname,
             "receiver": req.receiver.username,
             "id": req.id,
         }
         for req in friend_requests
     ]
     
+    return Response(requests_data, status=status.HTTP_200_OK)
+
+# http://127.0.0.1:8000/api/get-sents/?username=765ec0ee-4448-4856-89c1-64e7bd4ac8fb
+@api_view(['GET'])
+def get_friend_sents(request):
+    username = request.query_params.get('username', None)
+    user = get_object_or_404(User, username=username)
+    friend_requests = FriendRequest.objects.filter(sender=user)
+
+    if not friend_requests.exists():
+        return Response({"message": "No pending friend requests."}, status=status.HTTP_200_OK)
+
+    requests_data = [
+        {
+            "sender": req.sender.username,
+            "sender_n": req.sender.nickname,
+            "receiver": req.receiver.username,
+            "id": req.id,
+        }
+        for req in friend_requests
+    ]
+    
+    return Response(requests_data, status=status.HTTP_200_OK)
+
+# http://127.0.0.1:8000/api/rej-request/?id=1&receiver=8b1053ac-fffc-4a8f-b7f6-d6e3e4bba981
+@api_view(['GET'])
+def rej_friend_requests(request):
+    req_id = request.query_params.get('id', None)
+    receiver = request.query_params.get('receiver', None)
+    request = FriendRequest.objects.get(id=req_id)
+
+    if not request:
+        return Response({"error": "This request does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+    if str(request.receiver.username) != str(receiver):
+        return Response({"error": "You don't have right to reject this request."}, status=status.HTTP_400_BAD_REQUEST)
+
+    request.delete()
+    return Response("Successfully rejected friend request", status=status.HTTP_200_OK)
+
+# http://127.0.0.1:8000/api/acc-request/?id=1&receiver=8b1053ac-fffc-4a8f-b7f6-d6e3e4bba981
+@api_view(['GET'])
+def acc_friend_requests(request):
+    req_id = request.query_params.get('id', None)
+    receiver = request.query_params.get('receiver', None)
+    request = FriendRequest.objects.get(id=req_id)
+    sender = request.sender.username
+
+    if not request:
+        return Response({"error": "This request does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+    if str(request.receiver.username) != str(receiver):
+        return Response({"error": "You don't have right to accept this request."}, status=status.HTTP_400_BAD_REQUEST)
+
+    senderObj = User.objects.get(username=sender)
+    receiverObj = User.objects.get(username=receiver)
+    senderObj.friends.add(receiverObj.id) 
+    receiverObj.friends.add(senderObj.id)
+
+    request.delete()
+    return Response("Successfully accepted friend request", status=status.HTTP_200_OK)
+
+# http://127.0.0.1:8000/api/get-friends/?username=8b1053ac-fffc-4a8f-b7f6-d6e3e4bba981
+@api_view(['GET'])
+def get_friends(request):
+    username = request.query_params.get('username', None)
+    if not username:
+        return Response({"error": "Did not have account username"}, status=status.HTTP_400_BAD_REQUEST)
+    user = User.objects.get(username=username)
+
+    requests_data = [
+        {
+            "friends": list(user.friends.values("id", "username")),
+        }
+    ]
     return Response(requests_data, status=status.HTTP_200_OK)

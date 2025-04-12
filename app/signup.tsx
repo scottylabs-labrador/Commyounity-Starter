@@ -60,9 +60,9 @@ export default function SignUpScreen() {
                 window.alert('Verification code sent to email, please check it out');
               } catch (err) {
                 if (err instanceof EmailJSResponseStatus) {
-                  window.alert('Failed to send verification email');
+                  // window.alert('Failed to send verification email');
                 } else {
-                  window.alert(err);
+                  // window.alert(err);
                 }
               }
             } else if (response.status === 400) {
@@ -72,7 +72,7 @@ export default function SignUpScreen() {
             }
         } catch (error) {
             console.error('Login error:', error);
-            window.alert('Could not connect to the server.');
+            // window.alert('Could not connect to the server.');
         }
       };
 
